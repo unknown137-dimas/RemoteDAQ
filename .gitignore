@@ -1,3 +1,5 @@
 project/*
 *.code-workspace
-python-advantech-DAQNavi-bdaqctrl/*
+__pycache__/*
+Automation/__pycache__/*
+Automation/BDaq/__pycache__/*
