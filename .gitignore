@@ -1,0 +1,3 @@
+project/*
+*.code-workspace
+python-advantech-DAQNavi-bdaqctrl/*
