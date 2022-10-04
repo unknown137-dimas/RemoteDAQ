@@ -1,5 +1,5 @@
 remoteDAQ/project/*
 *.code-workspace
 remoteDAQ/Automation/BDaq/__pycache__/*
-remoteDAQ/__pycache__/CommonUtils.cpython-310.pyc
-remoteDAQ/Automation/__pycache__/__init__.cpython-310.pyc
+remoteDAQ/__pycache__/*
+remoteDAQ/Automation/__pycache__/*
