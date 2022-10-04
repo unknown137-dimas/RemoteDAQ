@@ -7,6 +7,7 @@ services:
       - 8086:8086
     volumes:
       - influxdb-data:/var/lib/influxdb2
+      - $PWD/config:/etc/influxdb2/
 
 volumes:
   influxdb-data:
