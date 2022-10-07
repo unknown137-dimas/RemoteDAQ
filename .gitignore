@@ -1,4 +1,4 @@
-remoteDAQ/project/*
+.env/*
 *.code-workspace
 remoteDAQ/Automation/BDaq/__pycache__/*
 remoteDAQ/__pycache__/*
