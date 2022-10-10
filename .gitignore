@@ -3,3 +3,4 @@
 remoteDAQ/Automation/BDaq/__pycache__/*
 remoteDAQ/__pycache__/*
 remoteDAQ/Automation/__pycache__/*
+*_example.py
