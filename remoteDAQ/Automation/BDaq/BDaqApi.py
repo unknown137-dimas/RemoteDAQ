@@ -1588,7 +1588,6 @@ class TInstantDoCtrl(object):
     def readAny(obj, startPort, portCount, dataArray):
         dll.TInstantDoCtrl_ReadAny.argtypes = [c_uint64, c_int32, c_int32, POINTER(c_uint8)]
         return dll.TInstantDoCtrl_ReadAny(obj, startPort, portCount, dataArray)
-
     @staticmethod
     def writeBit(obj, port, bit, data):
         dll.TInstantDoCtrl_WriteBit.argtypes = [c_uint64, c_int32, c_int32, c_uint8]
@@ -1597,7 +1596,8 @@ class TInstantDoCtrl(object):
     @staticmethod
     def readBit(obj, port, bit, data):
         dll.TInstantDoCtrl_ReadBit.argtypes = [c_uint64, c_int32, c_int32, POINTER(c_uint8)]
-        return dll.TInstantDoCtrl_ReadBit(obj, port, bit, byref(data))
+        # return dll.TInstantDoCtrl_ReadBit(obj, port, bit, byref(data))
+        return dll.TInstantDoCtrl_ReadBit(obj, port, bit, data)
 
 
 class TInstantDiCtrl(object):
