@@ -84,7 +84,7 @@ def di_daq(devDesc, portList):
    else:
       for i in portList:
          _, data = instantDiCtrl.readBit(0, i)
-         my_logger.info('Successfully read digital input channel # ' + str(i))
+         my_logger.info('Successfully read digital input channel #' + str(i))
          yield measurement_name, i, data
       my_logger.info('### Finished reading digital input channel data ###')
       instantDiCtrl.dispose()
@@ -101,7 +101,7 @@ def do_daq(devDesc, portList, data):
    else:
       for i in portList:
          _ = instantDoCtrl.writeBit(0, i, data)
-         my_logger.info('Successfully write digital output channel # ' + str(i))
+         my_logger.info('Successfully write digital output channel #' + str(i))
       my_logger.info('### Finished writing digital output channel data ###')
       instantDoCtrl.dispose()
 
@@ -118,7 +118,7 @@ def dov_daq(devDesc, portList):
    else:
       for i in portList:
          _, data = instantDoCtrl.readBit(0, i)
-         my_logger.info('Successfully read digital output channel # ' + str(i))
+         my_logger.info('Successfully read digital output channel #' + str(i))
          yield measurement_name, i, data
       my_logger.info('### Finished reading digital output channel data ###')
       instantDoCtrl.dispose()
@@ -136,7 +136,7 @@ def ai_daq(devDesc, portList, decimalPrecision=2):
    else:
       for i in portList:
          _, scaledData = instanceAiObj.readDataF64(i, 1)
-         my_logger.info('Successfully read analog channel # ' + str(i))
+         my_logger.info('Successfully read analog channel #' + str(i))
          yield measurement_name, i, round(scaledData[0], decimalPrecision)
       my_logger.info('### Finished reading analog channel data ###')
       instanceAiObj.dispose()
@@ -153,7 +153,7 @@ def ao_daq(devDesc, portList, data=[0, 0]):
    else:
       for i in portList:
          _ = instantAoCtrl.writeAny(i, 1, None, data)
-         my_logger.info('Successfully write analog output channel # ' + str(i))
+         my_logger.info('Successfully write analog output channel #' + str(i))
       my_logger.info('### Finished writing data to analog channel ###')
       instantAoCtrl.dispose()
       
@@ -203,13 +203,13 @@ def send_to_influxdb(data, num_of_points):
 if __name__ == '__main__':
    send_to_db = False
    input = True
-   while True:
+   for _ in range(num_of_points):
       if input:
          input_data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(0,8)])]
          if input_data and send_to_db:
             send_to_influxdb(input_data, num_of_points)
             time.sleep(1)
          else:
-            print(input_data)
+            my_logger.info(input_data)
       else:
          output_data = do_daq(devDesc=devDesc, portList=[i for i in range(0,8)], data=1)
