@@ -2,10 +2,8 @@ import sys
 sys.path.append('..')
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from datetime import timedelta, datetime
 import time
 from uuid import uuid3, NAMESPACE_DNS
-import random
 import reactivex as rx
 from reactivex import operators as ops
 from socket import gethostname
@@ -16,8 +14,6 @@ from Automation.BDaq.InstantDiCtrl import InstantDiCtrl
 from Automation.BDaq.InstantDoCtrl import InstantDoCtrl
 from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
-from Automation.BDaq.BDaqApi import AdxEnumToString, BioFailed
-from os import getcwd
 
 # InfluxDB connection config
 bucket = 'remote-data-acquisition'
@@ -37,7 +33,7 @@ endPort = 7
 # Log config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
 
-LOG_FILE = getcwd() + '/remoteDAQ.log'
+LOG_FILE = 'remoteDAQ.log'
 
 '''
 Log Function
@@ -135,8 +131,7 @@ def ai_daq(devDesc, portList, decimalPrecision=2):
    measurement_name = 'analogInput'
    try:
       instanceAiObj = InstantAiCtrl(devDesc)
-   # except ValueError as e:
-   except Exception as e:
+   except ValueError as e:
       my_logger.error(e)
    else:
       for i in portList:
@@ -184,8 +179,6 @@ def send_to_influxdb(data, num_of_points):
                                                       max_retry_delay=10_000,
                                                       exponential_base=2)) as write_client:
          
-         # write_client.write(bucket=bucket, org=org, record=data)
-         
          '''
          Prepare Batches from Generator
          '''
@@ -193,8 +186,10 @@ def send_to_influxdb(data, num_of_points):
             '''
             Synchronous Write
             '''
-            print(f'Writing... {len(batch)}')
+            my_logger.info('### Starting Sending input data to DB ###')
             write_client.write(bucket=bucket, record=batch)
+            my_logger.info('### Finished Sending input data to DB ###')
+
          batches = rx.from_iterable(data).pipe(ops.buffer_with_count(num_of_points*(len(data))))
          
          '''
@@ -204,24 +199,17 @@ def send_to_influxdb(data, num_of_points):
                            on_error=lambda ex: print(f'Unexpected error: {ex}'),
                            on_completed=lambda: print('Import finished!'))
 
-   # # batches = rx.interval(period=timedelta(seconds=interval)).pipe(data)
-
-
 
 if __name__ == '__main__':
-   # '''
-   # Data Aggregator
-   # '''
-   # data = rx.interval(period=timedelta(seconds=interval)).pipe(
-   #           ops.map(lambda _: ai_daq(devDesc, startPort, endPort)),
-   #           ops.map(lambda name, channel, value: line_protocol(name, channel, value)))
-   # data = []
-   # for i in range(num_of_points):
+   send_to_db = False
+   input = True
    while True:
-      data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(0,8)])]
-      if data:
-         print('sending data to DB...')
-         # send_to_influxdb(data, num_of_points)
-         print(data, num_of_points)
-         time.sleep(1)
-      break
+      if input:
+         input_data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(0,8)])]
+         if input_data and send_to_db:
+            send_to_influxdb(input_data, num_of_points)
+            time.sleep(1)
+         else:
+            print(input_data)
+      else:
+         output_data = do_daq(devDesc=devDesc, portList=[i for i in range(0,8)], data=1)
