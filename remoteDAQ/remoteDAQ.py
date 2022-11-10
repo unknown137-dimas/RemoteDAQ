@@ -23,7 +23,7 @@ url='http://192.168.117.132:8086'
 
 # Data config
 interval = 2
-num_of_points = 1
+num_of_points = 10
 
 # DAQ config
 devDesc = 'USB-4704,BID#0'
@@ -152,7 +152,7 @@ def ao_daq(devDesc, portList, data=[0, 0]):
       my_logger.error(e)
    else:
       for i in portList:
-         _ = instantAoCtrl.writeAny(i, 1, None, data)
+         _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
          my_logger.info('Successfully write analog output channel #' + str(i))
       my_logger.info('### Finished writing data to analog channel ###')
       instantAoCtrl.dispose()
@@ -202,14 +202,15 @@ def send_to_influxdb(data, num_of_points):
 
 if __name__ == '__main__':
    send_to_db = False
-   input = True
-   for _ in range(num_of_points):
-      if input:
-         input_data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(0,8)])]
+   input = False
+   if input:
+      for _ in range(num_of_points):
+         input_data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(6,8)])]
          if input_data and send_to_db:
             send_to_influxdb(input_data, num_of_points)
             time.sleep(1)
          else:
             my_logger.info(input_data)
-      else:
-         output_data = do_daq(devDesc=devDesc, portList=[i for i in range(0,8)], data=1)
+            time.sleep(1)
+   else:
+      output_data = do_daq(devDesc=devDesc, portList=[4,5], data=1)
