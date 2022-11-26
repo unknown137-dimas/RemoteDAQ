@@ -14,26 +14,32 @@ from Automation.BDaq.InstantDiCtrl import InstantDiCtrl
 from Automation.BDaq.InstantDoCtrl import InstantDoCtrl
 from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
+import paho.mqtt.client as mqtt
+import json
 
-# InfluxDB connection config
-bucket = 'remote-data-acquisition'
-org = 'UGM'
-token = 'PXCJT5naU4g1R04-b9U_MtMBFLYkimD4-QZ0GyswJiBwov7MzOMj_ABppwuxvNXIK2HknQnp_qrVYXLfwY2cww=='
-url='http://192.168.117.132:8086'
+# InfluxDB connection Config
+bucket = 'remote-data-acquisition' # CHANGE THIS
+org = 'UGM' # CHANGE THIS
+token = 'PXCJT5naU4g1R04-b9U_MtMBFLYkimD4-QZ0GyswJiBwov7MzOMj_ABppwuxvNXIK2HknQnp_qrVYXLfwY2cww=='  # CHANGE THIS
+url='http://192.168.117.132:8086' # CHANGE THIS
+send_to_db = False
 
-# Data config
+# Data Config
+dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
 interval = 2
 num_of_points = 10
 
-# DAQ config
-devDesc = 'USB-4704,BID#0'
-startPort = 0
-endPort = 7
+# DAQ Config
+devDesc = 'USB-4704,BID#0' # CHANGE THIS
+devFunc = {'funcMode':1, 'ports':[0,1], 'data':[1]}
 
-# Log config
+# Log Config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
-
 LOG_FILE = 'remoteDAQ.log'
+
+# MQTT Config
+mqttBroker ='mqtt.eclipseprojects.io' # CHANGE THIS
+funcConfig = 'remoteDAQ/devFunction'
 
 '''
 Log Function
@@ -73,7 +79,7 @@ DAQ Function
 '''
 def di_daq(devDesc, portList):
    '''
-   Function to Read Digital Input
+   Function to Read Digital Input Signal
    '''
    my_logger.info('### Starting reading digital input channel data ###')
    measurement_name = 'digitalInput'
@@ -91,7 +97,7 @@ def di_daq(devDesc, portList):
    
 def do_daq(devDesc, portList, data):
    '''
-   Function to Write Digital Output
+   Function to Write Digital Output Signal
    '''
    my_logger.info('### Starting writing digital output channel data ###')
    try:
@@ -104,10 +110,11 @@ def do_daq(devDesc, portList, data):
          my_logger.info('Successfully write digital output channel #' + str(i))
       my_logger.info('### Finished writing digital output channel data ###')
       instantDoCtrl.dispose()
+      return 0
 
-def dov_daq(devDesc, portList):
+def doi_daq(devDesc, portList):
    '''
-   Function to Read Digital Output Value
+   Function to Read Digital Output Signal
    '''
    my_logger.info('### Starting reading digital output channel data ###')
    measurement_name = 'digitalOutputValue'
@@ -125,7 +132,7 @@ def dov_daq(devDesc, portList):
 
 def ai_daq(devDesc, portList, decimalPrecision=2):
    '''
-   Function to Read Analog Signal
+   Function to Read Analog Input Signal
    '''
    my_logger.info('### Starting reading analog channel data ###')
    measurement_name = 'analogInput'
@@ -143,7 +150,7 @@ def ai_daq(devDesc, portList, decimalPrecision=2):
 
 def ao_daq(devDesc, portList, data=[0, 0]):
    '''
-   Function to Output Analog Signal
+   Function to Write Analog Output Signal
    '''
    my_logger.info('### Starting writing data to analog channel ###')
    try:
@@ -156,20 +163,24 @@ def ao_daq(devDesc, portList, data=[0, 0]):
          my_logger.info('Successfully write analog output channel #' + str(i))
       my_logger.info('### Finished writing data to analog channel ###')
       instantAoCtrl.dispose()
+      return 0
       
-def line_protocol(measurement_name, channel, value):
+'''
+INFLUXDB Funcion
+'''
+def line_protocol(measurement_name, channel, value, id):
    '''
    Create an InfluxDB Dictionary
    '''
    return '{measurement},nodeID={id},channel={ch} value={val}'.format(measurement=measurement_name,
-      id=uuid3(NAMESPACE_DNS, gethostname()),
+      id=id,
       ch=channel,
       val=value)
 
 def send_to_influxdb(data, num_of_points):
    '''
-   # Send Data to InfluxDB
-   # '''
+   Send Data to InfluxDB
+   '''
    with InfluxDBClient(url=url, token=token, org=org) as client:
       with client.write_api(write_options=WriteOptions(batch_size=1,
                                                       flush_interval=10_000,
@@ -199,18 +210,43 @@ def send_to_influxdb(data, num_of_points):
                            on_error=lambda ex: print(f'Unexpected error: {ex}'),
                            on_completed=lambda: print('Import finished!'))
 
+'''
+MQTT Function
+'''
+def mqtt_connect(client_id):
+   client = mqtt.Client(client_id)
+   client.connect(mqttBroker)
+   client.subscribe(funcConfig)
+   client.on_message = mqtt_on_message
+   client.loop_forever()
+
+def mqtt_on_message(client, userdata, message):
+    command = str(message.payload.decode('utf-8'))
+    jsonCommand = json.loads(command)
+    devFunc['funcMode'] = jsonCommand['funcMode']
+    devFunc['ports'] = jsonCommand['ports']
+    devFunc['data'] = jsonCommand['data']
+    client.disconnect()
 
 if __name__ == '__main__':
-   send_to_db = False
-   input = False
-   if input:
+   # Need Multithreading
+   funcMode = {0:doi_daq(devDesc, devFunc['ports']),
+               1:di_daq(devDesc, devFunc['ports']),
+               2:do_daq(devDesc, devFunc['ports'], devFunc['data']),
+               3:ai_daq(devDesc, devFunc['ports']),
+               4:ao_daq(devDesc, devFunc['ports'], devFunc['data'])}
+   while True:
+      mqtt_connect(dev_id)
+      print(devFunc)
+      time.sleep(1)
+   
+   inputData = funcMode[devFunc['funcMode']]
+   if inputData:
       for _ in range(num_of_points):
-         input_data = [line_protocol(measurement_name=name, channel=channel, value=value) for name, channel, value in di_daq(devDesc=devDesc, portList=[i for i in range(6,8)])]
-         if input_data and send_to_db:
+         input_data = [line_protocol(measurement_name=name, channel=channel, value=value, id=dev_id) for name, channel, value in inputData]
+         if send_to_db:
             send_to_influxdb(input_data, num_of_points)
             time.sleep(1)
          else:
             my_logger.info(input_data)
             time.sleep(1)
-   else:
-      output_data = do_daq(devDesc=devDesc, portList=[4,5], data=1)
