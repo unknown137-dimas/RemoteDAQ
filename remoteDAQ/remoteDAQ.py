@@ -41,9 +41,7 @@ LOG_FILE = 'remoteDAQ.log'
 mqttBroker ='mqtt.eclipseprojects.io' # CHANGE THIS
 funcConfig = 'remoteDAQ/devFunction'
 
-'''
-Log Function
-'''
+'''Log Function'''
 def get_console_handler():
    '''
    Console Output Handler
@@ -74,9 +72,7 @@ def get_logger(logger_name):
 
 my_logger = get_logger('remoteDAQ')
 
-'''
-DAQ Function
-'''
+'''DAQ Function'''
 def di_daq(devDesc, portList):
    '''
    Function to Read Digital Input Signal
@@ -165,9 +161,7 @@ def ao_daq(devDesc, portList, data=[0, 0]):
       instantAoCtrl.dispose()
       return 0
       
-'''
-INFLUXDB Funcion
-'''
+'''INFLUXDB Funcion'''
 def line_protocol(measurement_name, channel, value, id):
    '''
    Create an InfluxDB Dictionary
@@ -210,9 +204,7 @@ def send_to_influxdb(data, num_of_points):
                            on_error=lambda ex: print(f'Unexpected error: {ex}'),
                            on_completed=lambda: print('Import finished!'))
 
-'''
-MQTT Function
-'''
+'''MQTT Function'''
 def mqtt_connect(client_id):
    client = mqtt.Client(client_id)
    client.connect(mqttBroker)

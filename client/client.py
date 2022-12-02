@@ -16,13 +16,9 @@ data_fields = ['nodeID', 'channel', '_value']
 mqttBroker ='mqtt.eclipseprojects.io' 
 topic = 'remoteDAQ/devFunction'
 
-'''
-INFLUXDB Function
-'''
+'''INFLUXDB Function'''
 def get_data_table(bucket, range, measurement, data_fields):
-    '''
-    Query Data Using Table Structure
-    '''
+    '''Query Data Using Table Structure'''
     with InfluxDBClient(url=url, token=token, org=org) as client:
         query_api = client.query_api()
         tables = query_api.query('from(bucket:"'+ bucket +'") |> range(start: '+ range +') |> filter(fn: (r) => r["_measurement"] == "'+ measurement +'")')
