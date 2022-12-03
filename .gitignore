@@ -1,4 +1,4 @@
-.env/*
+.*-venv/*
 *.code-workspace
 Automation/BDaq/__pycache__/*
 __pycache__/*
