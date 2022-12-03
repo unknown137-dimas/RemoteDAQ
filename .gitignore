@@ -1,9 +1,9 @@
 .env/*
 *.code-workspace
-remoteDAQ/Automation/BDaq/__pycache__/*
-remoteDAQ/__pycache__/*
-remoteDAQ/Automation/__pycache__/*
+Automation/BDaq/__pycache__/*
+__pycache__/*
+Automation/__pycache__/*
 *_example.py
-remoteDAQ/delete_data.py
-remoteDAQ/device_features_settings.py
+delete_data.py
+device_features_settings.py
 remoteDAQ.log*
