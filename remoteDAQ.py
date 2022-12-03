@@ -4,8 +4,6 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import time
 from uuid import uuid3, NAMESPACE_DNS
-import reactivex as rx
-from reactivex import operators as ops
 from socket import gethostname
 from influxdb_client import WriteOptions
 from influxdb_client.client.influxdb_client import InfluxDBClient
@@ -26,12 +24,10 @@ send_to_db = False
 
 # Data Config
 dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
-interval = 2
-num_of_points = 10
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
-devFunc = {'funcMode':1, 'ports':[0,1], 'data':[1]}
+devFunc = {'funcMode':3, 'ports':[_ for _ in range(0, 8)]} # DEFAULT BEHAVIOR
 
 # Log Config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
@@ -171,7 +167,7 @@ def line_protocol(measurement_name, channel, value, id):
       ch=channel,
       val=value)
 
-def send_to_influxdb(data, num_of_points):
+def send_to_influxdb(data):
    '''
    Send Data to InfluxDB
    '''
@@ -184,25 +180,9 @@ def send_to_influxdb(data, num_of_points):
                                                       max_retry_delay=10_000,
                                                       exponential_base=2)) as write_client:
          
-         '''
-         Prepare Batches from Generator
-         '''
-         def write_batch(batch):
-            '''
-            Synchronous Write
-            '''
-            my_logger.info('### Starting Sending input data to DB ###')
-            write_client.write(bucket=bucket, record=batch)
-            my_logger.info('### Finished Sending input data to DB ###')
-
-         batches = rx.from_iterable(data).pipe(ops.buffer_with_count(num_of_points*(len(data))))
-         
-         '''
-         Write Batches
-         '''
-         batches.subscribe(on_next=lambda batch: write_batch(batch),
-                           on_error=lambda ex: print(f'Unexpected error: {ex}'),
-                           on_completed=lambda: print('Import finished!'))
+         my_logger.info('### Starting Sending input data to DB ###')
+         write_client.write(bucket=bucket, record=data)
+         my_logger.info('### Finished Sending input data to DB ###')
 
 '''MQTT Function'''
 def mqtt_connect(client_id):
@@ -222,23 +202,24 @@ def mqtt_on_message(client, userdata, message):
 
 if __name__ == '__main__':
    # Need Multithreading
-   funcMode = {0:doi_daq(devDesc, devFunc['ports']),
-               1:di_daq(devDesc, devFunc['ports']),
-               2:do_daq(devDesc, devFunc['ports'], devFunc['data']),
-               3:ai_daq(devDesc, devFunc['ports']),
-               4:ao_daq(devDesc, devFunc['ports'], devFunc['data'])}
-   while True:
-      mqtt_connect(dev_id)
-      print(devFunc)
-      time.sleep(1)
-   
-   inputData = funcMode[devFunc['funcMode']]
+   # funcMode = {0:doi_daq(devDesc, devFunc['ports']),
+   #             1:di_daq(devDesc, devFunc['ports']),
+   #             2:do_daq(devDesc, devFunc['ports'], devFunc['data']),
+   #             3:ai_daq(devDesc, devFunc['ports']),
+   #             4:ao_daq(devDesc, devFunc['ports'], devFunc['data'])}
+   # while True:
+   #    mqtt_connect(dev_id)
+   #    print(devFunc)
+   #    time.sleep(1)
+
+   # inputData = funcMode[devFunc['funcMode']]
+   send_to_db = True
+   inputData = ai_daq(devDesc, [1,3,5])
    if inputData:
-      for _ in range(num_of_points):
-         input_data = [line_protocol(measurement_name=name, channel=channel, value=value, id=dev_id) for name, channel, value in inputData]
-         if send_to_db:
-            send_to_influxdb(input_data, num_of_points)
-            time.sleep(1)
-         else:
-            my_logger.info(input_data)
-            time.sleep(1)
+      input_data = [line_protocol(measurement_name=name, channel=channel, value=value, id=dev_id) for name, channel, value in inputData]
+      if send_to_db:
+         send_to_influxdb(input_data)
+         time.sleep(1)
+      else:
+         my_logger.info(input_data)
+         time.sleep(1)
