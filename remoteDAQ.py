@@ -205,6 +205,16 @@ def func_mode(devDesc, devFunc):
    elif devFunc['funcMode'] == 4:
       ao_daq(devDesc, devFunc['ports'], devFunc['data'])
 
+'''Multiprocessing Function'''
+def smap(f, *arg):
+    return f(*arg)
+
+def parallel(proc_list):
+   with Pool() as pool:
+      _ = pool.starmap_async(smap, proc_list)
+      pool.close()
+      pool.join()
+
 '''API'''
 app = FastAPI()
 
