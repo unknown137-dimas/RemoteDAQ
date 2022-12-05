@@ -14,6 +14,8 @@ from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
 import paho.mqtt.client as mqtt
 import json
 from multiprocessing import Pool
+from fastapi import FastAPI, Header
+import requests
 
 # InfluxDB connection Config
 bucket = 'remote-data-acquisition' # CHANGE THIS
@@ -202,6 +204,14 @@ def func_mode(devDesc, devFunc):
       return ai_daq(devDesc, devFunc['ports'])
    elif devFunc['funcMode'] == 4:
       ao_daq(devDesc, devFunc['ports'], devFunc['data'])
+
+'''API'''
+app = FastAPI()
+
+@app.get('/ping')
+async def ping():
+    return 'pong!!!'
+
 
 if __name__ == '__main__':
    pass
