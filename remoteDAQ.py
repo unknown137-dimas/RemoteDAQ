@@ -11,11 +11,10 @@ from Automation.BDaq.InstantDiCtrl import InstantDiCtrl
 from Automation.BDaq.InstantDoCtrl import InstantDoCtrl
 from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
-import paho.mqtt.client as mqtt
 import json
 from multiprocessing import Pool
 import asyncio
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Body, Header
 import requests
 
 # InfluxDB connection Config
@@ -36,10 +35,6 @@ portList = [_ for _ in range(0,8)]
 # Log Config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
 LOG_FILE = 'remoteDAQ.log'
-
-# MQTT Config
-mqttBroker ='192.168.117.132' # CHANGE THIS
-funcConfig = 'remoteDAQ/devFunction'
 
 '''Log Function'''
 def get_file_handler():
@@ -87,7 +82,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       instantDiCtrl.dispose()
       return result
    
-def do_daq(devDesc, portList, data, logger=my_logger):
+async def do_daq(devDesc, data, logger=my_logger):
    '''
    Function to Write Digital Output Signal
    '''
@@ -97,8 +92,8 @@ def do_daq(devDesc, portList, data, logger=my_logger):
    except ValueError as e:
       logger.error(e)
    else:
-      for i in portList:
-         _ = instantDoCtrl.writeBit(0, i, data)
+      for i in range(len(data)):
+         _ = instantDoCtrl.writeAny(i, 1, [data[i]])
          logger.info('Successfully write digital output port #' + str(i))
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
@@ -152,7 +147,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj.dispose()
       return result
 
-def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
+async def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
    '''
    Function to Write Analog Output Signal
    '''
@@ -196,34 +191,18 @@ def send_to_influxdb(url, token, org, bucket, data):
          write_client.write(bucket, data)
          my_logger.info('### Finished Sending input data to DB ###')
 
-'''MQTT Function'''
-def mqtt_connect(client_id, mqttBroker, funcConfig):
-   client = mqtt.Client(client_id)
-   client.connect(mqttBroker)
-   client.subscribe(funcConfig)
-   client.on_message = mqtt_on_message
-   client.loop_forever()
-
-def mqtt_on_message(client, userdata, message):
-    command = str(message.payload.decode('utf-8'))
-    jsonCommand = json.loads(command)
-    devFunc['funcMode'] = jsonCommand['funcMode']
-    devFunc['ports'] = jsonCommand['ports']
-    devFunc['data'] = jsonCommand['data']
-    client.disconnect()
-
-'''DAQ Mode Function'''
-def func_mode(devDesc, devFunc):
-   if devFunc['funcMode'] == 0:
-      return doi_daq(devDesc, devFunc['ports'])
-   elif devFunc['funcMode'] == 1:
-      return di_daq(devDesc, devFunc['ports'])
-   elif devFunc['funcMode'] == 2:
-      do_daq(devDesc, devFunc['ports'], devFunc['data'])
-   elif devFunc['funcMode'] == 3:
-      return ai_daq(devDesc, devFunc['ports'])
-   elif devFunc['funcMode'] == 4:
-      ao_daq(devDesc, devFunc['ports'], devFunc['data'])
+# '''DAQ Mode Function'''
+# def func_mode(devDesc, devFunc):
+#    if devFunc['funcMode'] == 0:
+#       return doi_daq(devDesc, devFunc['ports'])
+#    elif devFunc['funcMode'] == 1:
+#       return di_daq(devDesc, devFunc['ports'])
+#    elif devFunc['funcMode'] == 2:
+#       do_daq(devDesc, devFunc['ports'], devFunc['data'])
+#    elif devFunc['funcMode'] == 3:
+#       return ai_daq(devDesc, devFunc['ports'])
+#    elif devFunc['funcMode'] == 4:
+#       ao_daq(devDesc, devFunc['ports'], devFunc['data'])
 
 '''Multiprocessing Function'''
 def smap(f, *arg):
@@ -255,6 +234,27 @@ app = FastAPI()
 async def ping():
     return 'pong!!!'
 
+@app.get('/analog/input')
+async def get_analog_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+   result = await ai_daq(devDesc, portList)
+   return result
 
-if __name__ == '__main__':
-   asyncio.run(main())
+@app.get('/digital/input')
+async def get_digital_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+   result = await di_daq(devDesc, portList)
+   return result
+
+@app.get('/digital_output/input')
+async def get_digital_output_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+   result = await doi_daq(devDesc, portList)
+   return result
+
+@app.put('/analog/output')
+async def get_analog_output(devDesc: str = Body(embed=True), portList: list = Body(embed=True), data: list = Body(embed=True)):
+   result = await ao_daq(devDesc, portList, data)
+   return result
+
+@app.put('/digital/output')
+async def get_digital_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
+   result = await do_daq(devDesc, data)
+   return result
