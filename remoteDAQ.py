@@ -69,6 +69,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
+      return e
    else:
       for i in portList:
          tmp = {}
@@ -87,17 +88,21 @@ async def do_daq(devDesc, data, logger=my_logger):
    Function to Write Digital Output Signal
    '''
    logger.info('### Starting writing digital output data ###')
+   result = {}
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
+      return e
    else:
       for i in range(len(data)):
          _ = instantDoCtrl.writeAny(i, 1, [data[i]])
          logger.info('Successfully write digital output port #' + str(i))
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
-      return 0
+      result['devDesc'] = devDesc
+      result['data'] = data
+      return result
 
 async def doi_daq(devDesc, portList, logger=my_logger):
    '''
@@ -110,6 +115,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
+      return e
    else:
       for i in portList:
          tmp = {}
@@ -134,6 +140,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
+      return e
    else:
       for i in portList:
          tmp = {}
@@ -152,19 +159,24 @@ async def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
    Function to Write Analog Output Signal
    '''
    logger.info('### Starting writing analog output data ###')
+   result = {}
    try:
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
+      return e
    else:
       for i in portList:
          _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
          logger.info('Successfully write analog output port #' + str(i))
       logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
-      return 0
+      result['devDesc'] = devDesc
+      result['portList'] = portList
+      result['data'] = data
+      return result
       
-'''INFLUXDB Funcion'''
+'''INFLUXDB Function'''
 def line_protocol(measurement_name, port, value, id):
    '''
    Create an InfluxDB Dictionary
@@ -190,19 +202,6 @@ def send_to_influxdb(url, token, org, bucket, data):
          my_logger.info('### Starting Sending input data to DB ###')
          write_client.write(bucket, data)
          my_logger.info('### Finished Sending input data to DB ###')
-
-# '''DAQ Mode Function'''
-# def func_mode(devDesc, devFunc):
-#    if devFunc['funcMode'] == 0:
-#       return doi_daq(devDesc, devFunc['ports'])
-#    elif devFunc['funcMode'] == 1:
-#       return di_daq(devDesc, devFunc['ports'])
-#    elif devFunc['funcMode'] == 2:
-#       do_daq(devDesc, devFunc['ports'], devFunc['data'])
-#    elif devFunc['funcMode'] == 3:
-#       return ai_daq(devDesc, devFunc['ports'])
-#    elif devFunc['funcMode'] == 4:
-#       ao_daq(devDesc, devFunc['ports'], devFunc['data'])
 
 '''Multiprocessing Function'''
 def smap(f, *arg):
