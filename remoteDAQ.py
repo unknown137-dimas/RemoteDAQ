@@ -14,6 +14,7 @@ from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
 import paho.mqtt.client as mqtt
 import json
 from multiprocessing import Pool
+import asyncio
 from fastapi import FastAPI, Header
 import requests
 
@@ -30,6 +31,7 @@ dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
 devFunc = {'funcMode':3, 'ports':[_ for _ in range(0, 8)], 'data':0} # DEFAULT BEHAVIOR
+portList = [_ for _ in range(0,8)]
 
 # Log Config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
@@ -61,29 +63,35 @@ def get_logger(logger_name):
 my_logger = get_logger('remoteDAQ')
 
 '''DAQ Function'''
-def di_daq(devDesc, portList, logger=my_logger):
+async def di_daq(devDesc, portList, logger=my_logger):
    '''
    Function to Read Digital Input Signal
    '''
-   logger.info('### Starting reading digital input channel data ###')
+   logger.info('### Starting reading digital input data ###')
    measurement_name = 'digitalInput'
+   result = []
    try:
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
    else:
       for i in portList:
+         tmp = {}
          _, data = instantDiCtrl.readBit(0, i)
-         logger.info('Successfully read digital input channel #' + str(i))
-         yield measurement_name, i, data
-      logger.info('### Finished reading digital input channel data ###')
+         logger.info('Successfully read digital input port #' + str(i))
+         tmp['measurement_name'] = measurement_name
+         tmp['port'] = i
+         tmp['data'] = data
+         result.append(tmp)
+      logger.info('### Finished reading digital input data ###')
       instantDiCtrl.dispose()
+      return result
    
 def do_daq(devDesc, portList, data, logger=my_logger):
    '''
    Function to Write Digital Output Signal
    '''
-   logger.info('### Starting writing digital output channel data ###')
+   logger.info('### Starting writing digital output data ###')
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
@@ -91,52 +99,64 @@ def do_daq(devDesc, portList, data, logger=my_logger):
    else:
       for i in portList:
          _ = instantDoCtrl.writeBit(0, i, data)
-         logger.info('Successfully write digital output channel #' + str(i))
-      logger.info('### Finished writing digital output channel data ###')
+         logger.info('Successfully write digital output port #' + str(i))
+      logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
       return 0
 
-def doi_daq(devDesc, portList, logger=my_logger):
+async def doi_daq(devDesc, portList, logger=my_logger):
    '''
    Function to Read Digital Output Signal
    '''
-   logger.info('### Starting reading digital output channel data ###')
+   logger.info('### Starting reading digital output data ###')
    measurement_name = 'digitalOutputValue'
+   result = []
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
    else:
       for i in portList:
+         tmp = {}
          _, data = instantDoCtrl.readBit(0, i)
-         logger.info('Successfully read digital output channel #' + str(i))
-         yield measurement_name, i, data
-      logger.info('### Finished reading digital output channel data ###')
+         logger.info('Successfully read digital output port #' + str(i))
+         tmp['measurement_name'] = measurement_name
+         tmp['port'] = i
+         tmp['data'] = data
+         result.append(tmp)
+      logger.info('### Finished reading digital output data ###')
       instantDoCtrl.dispose()
+      return result
 
-def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
+async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
    '''
    Function to Read Analog Input Signal
    '''
-   logger.info('### Starting reading analog channel data ###')
+   logger.info('### Starting reading analog input data ###')
    measurement_name = 'analogInput'
+   result = []
    try:
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
    else:
       for i in portList:
+         tmp = {}
          _, scaledData = instanceAiObj.readDataF64(i, 1)
-         logger.info('Successfully read analog channel #' + str(i))
-         yield measurement_name, i, round(scaledData[0], decimalPrecision)
-      logger.info('### Finished reading analog channel data ###')
+         logger.info('Successfully read analog input port #' + str(i))
+         tmp['measurement_name'] = measurement_name
+         tmp['port'] = i
+         tmp['data'] = round(scaledData[0], decimalPrecision)
+         result.append(tmp)
+      logger.info('### Finished reading analog input data ###')
       instanceAiObj.dispose()
+      return result
 
 def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
    '''
    Function to Write Analog Output Signal
    '''
-   logger.info('### Starting writing data to analog channel ###')
+   logger.info('### Starting writing analog output data ###')
    try:
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
@@ -144,19 +164,19 @@ def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
    else:
       for i in portList:
          _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
-         logger.info('Successfully write analog output channel #' + str(i))
-      logger.info('### Finished writing data to analog channel ###')
+         logger.info('Successfully write analog output port #' + str(i))
+      logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
       return 0
       
 '''INFLUXDB Funcion'''
-def line_protocol(measurement_name, channel, value, id):
+def line_protocol(measurement_name, port, value, id):
    '''
    Create an InfluxDB Dictionary
    '''
-   return '{measurement},nodeID={id},channel={ch} value={val}'.format(measurement=measurement_name,
+   return '{measurement},nodeID={id},port={port} value={val}'.format(measurement=measurement_name,
       id=id,
-      ch=channel,
+      port=port,
       val=value)
 
 def send_to_influxdb(url, token, org, bucket, data):
@@ -211,9 +231,22 @@ def smap(f, *arg):
 
 def parallel(proc_list):
    with Pool() as pool:
-      _ = pool.starmap_async(smap, proc_list)
+      x = pool.starmap_async(smap, proc_list)
+      print(x.get())
       pool.close()
       pool.join()
+
+async def sub_process_1():
+   di = await di_daq(devDesc, portList)
+   doi = await doi_daq(devDesc, portList)
+   ai = await ai_daq(devDesc, portList)
+   return {1:di, 2:doi, 3:ai}
+
+async def main():
+   output = await asyncio.gather(sub_process_1())
+   # with open('result.txt', 'w') as res:
+   #    for out in output:
+   #       res.writelines(json.dumps(out))
 
 '''API'''
 app = FastAPI()
@@ -224,4 +257,4 @@ async def ping():
 
 
 if __name__ == '__main__':
-   pass
+   asyncio.run(main())
