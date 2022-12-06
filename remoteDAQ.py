@@ -29,7 +29,6 @@ dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
-devFunc = {'funcMode':3, 'ports':[_ for _ in range(0, 8)], 'data':0} # DEFAULT BEHAVIOR
 portList = [_ for _ in range(0,8)]
 
 # Log Config
@@ -69,7 +68,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return e
+      return str(e)
    else:
       for i in portList:
          tmp = {}
@@ -93,10 +92,10 @@ async def do_daq(devDesc, data, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return e
+      return str(e)
    else:
       for i in range(len(data)):
-         _ = instantDoCtrl.writeAny(i, 1, [data[i]])
+         _ = instantDoCtrl.writeBit(0, i, data[i])
          logger.info('Successfully write digital output port #' + str(i))
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
@@ -115,7 +114,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return e
+      return str(e)
    else:
       for i in portList:
          tmp = {}
@@ -140,7 +139,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return e
+      return str(e)
    else:
       for i in portList:
          tmp = {}
@@ -154,7 +153,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj.dispose()
       return result
 
-async def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
+async def ao_daq(devDesc, data, logger=my_logger):
    '''
    Function to Write Analog Output Signal
    '''
@@ -164,15 +163,14 @@ async def ao_daq(devDesc, portList, data=[0, 0], logger=my_logger):
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return e
+      return str(e)
    else:
-      for i in portList:
+      for i in range(len(data)):
          _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
          logger.info('Successfully write analog output port #' + str(i))
       logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
       result['devDesc'] = devDesc
-      result['portList'] = portList
       result['data'] = data
       return result
       
@@ -234,26 +232,26 @@ async def ping():
     return 'pong!!!'
 
 @app.get('/analog/input')
-async def get_analog_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+async def get_analog_input():
    result = await ai_daq(devDesc, portList)
    return result
 
 @app.get('/digital/input')
-async def get_digital_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+async def get_digital_input():
    result = await di_daq(devDesc, portList)
    return result
 
 @app.get('/digital_output/input')
-async def get_digital_output_input(devDesc: str = Body(embed=True), portList: list = Body(embed=True)):
+async def get_digital_output_input():
    result = await doi_daq(devDesc, portList)
    return result
 
 @app.put('/analog/output')
-async def get_analog_output(devDesc: str = Body(embed=True), portList: list = Body(embed=True), data: list = Body(embed=True)):
-   result = await ao_daq(devDesc, portList, data)
+async def set_analog_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
+   result = await ao_daq(devDesc, data)
    return result
 
 @app.put('/digital/output')
-async def get_digital_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
+async def set_digital_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
    result = await do_daq(devDesc, data)
    return result
