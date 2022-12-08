@@ -11,11 +11,9 @@ from Automation.BDaq.InstantDiCtrl import InstantDiCtrl
 from Automation.BDaq.InstantDoCtrl import InstantDoCtrl
 from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
-import json
 from multiprocessing import Pool
 import asyncio
 from fastapi import FastAPI, Body, Header
-import requests
 
 # InfluxDB connection Config
 bucket = 'remote-data-acquisition' # CHANGE THIS
@@ -63,13 +61,16 @@ async def di_daq(devDesc, portList, logger=my_logger):
    '''
    logger.info('### Starting reading digital input data ###')
    measurement_name = 'digitalInput'
-   result = []
+   result = {}
    try:
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return str(e)
+      result['status'] = 'ERROR'
+      result['data'] = str(e)
+      return result
    else:
+      tmp_list = []
       for i in portList:
          tmp = {}
          _, data = instantDiCtrl.readBit(0, i)
@@ -77,9 +78,11 @@ async def di_daq(devDesc, portList, logger=my_logger):
          tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = data
-         result.append(tmp)
+         tmp_list.append(tmp)
       logger.info('### Finished reading digital input data ###')
       instantDiCtrl.dispose()
+      result['status'] = 'OK'
+      result['result'] = tmp_list
       return result
    
 async def do_daq(devDesc, data, logger=my_logger):
@@ -92,15 +95,22 @@ async def do_daq(devDesc, data, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return str(e)
+      result['status'] = 'ERROR'
+      result['data'] = str(e)
+      return result
    else:
+      tmp_list = []
       for i in range(len(data)):
+         tmp = {}
          _ = instantDoCtrl.writeBit(0, i, data[i])
          logger.info('Successfully write digital output port #' + str(i))
+         tmp['port'] = i
+         tmp['data'] = data[i]
+         tmp_list.append(tmp)
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
-      result['devDesc'] = devDesc
-      result['data'] = data
+      result['status'] = 'OK'
+      result['result'] = tmp_list
       return result
 
 async def doi_daq(devDesc, portList, logger=my_logger):
@@ -109,13 +119,16 @@ async def doi_daq(devDesc, portList, logger=my_logger):
    '''
    logger.info('### Starting reading digital output data ###')
    measurement_name = 'digitalOutputValue'
-   result = []
+   result = {}
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return str(e)
+      result['status'] = 'ERROR'
+      result['data'] = str(e)
+      return result
    else:
+      tmp_list = []
       for i in portList:
          tmp = {}
          _, data = instantDoCtrl.readBit(0, i)
@@ -123,9 +136,11 @@ async def doi_daq(devDesc, portList, logger=my_logger):
          tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = data
-         result.append(tmp)
+         tmp_list.append(tmp)
       logger.info('### Finished reading digital output data ###')
       instantDoCtrl.dispose()
+      result['status'] = 'OK'
+      result['result'] = tmp_list
       return result
 
 async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
@@ -134,13 +149,16 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
    '''
    logger.info('### Starting reading analog input data ###')
    measurement_name = 'analogInput'
-   result = []
+   result = {}
    try:
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return str(e)
+      result['status'] = 'ERROR'
+      result['result'] = str(e)
+      return result
    else:
+      tmp_list = []
       for i in portList:
          tmp = {}
          _, scaledData = instanceAiObj.readDataF64(i, 1)
@@ -148,9 +166,11 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
          tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = round(scaledData[0], decimalPrecision)
-         result.append(tmp)
+         tmp_list.append(tmp)
       logger.info('### Finished reading analog input data ###')
       instanceAiObj.dispose()
+      result['status'] = 'OK'
+      result['result'] = tmp_list
       return result
 
 async def ao_daq(devDesc, data, logger=my_logger):
@@ -163,15 +183,22 @@ async def ao_daq(devDesc, data, logger=my_logger):
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      return str(e)
+      result['status'] = 'ERROR'
+      result['data'] = str(e)
+      return result
    else:
+      tmp_list = []
       for i in range(len(data)):
+         tmp = {}
          _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
          logger.info('Successfully write analog output port #' + str(i))
+         tmp['port'] = i
+         tmp['data'] = data[i]
+         tmp_list.append(tmp)
       logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
-      result['devDesc'] = devDesc
-      result['data'] = data
+      result['status'] = 'OK'
+      result['result'] = tmp_list
       return result
       
 '''INFLUXDB Function'''
@@ -247,11 +274,11 @@ async def get_digital_output_input():
    return result
 
 @app.put('/analog/output')
-async def set_analog_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
+async def set_analog_output(data: list = Body(embed=True)):
    result = await ao_daq(devDesc, data)
    return result
 
 @app.put('/digital/output')
-async def set_digital_output(devDesc: str = Body(embed=True), data: list = Body(embed=True)):
+async def set_digital_output(data: list = Body(embed=True)):
    result = await do_daq(devDesc, data)
    return result
