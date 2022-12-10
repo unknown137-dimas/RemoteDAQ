@@ -66,7 +66,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      result['status'] = 'ERROR'
+      result['success'] = False
       result['data'] = str(e)
       return result
    else:
@@ -81,8 +81,8 @@ async def di_daq(devDesc, portList, logger=my_logger):
          tmp_list.append(tmp)
       logger.info('### Finished reading digital input data ###')
       instantDiCtrl.dispose()
-      result['status'] = 'OK'
-      result['result'] = tmp_list
+      result['success'] = True
+      result['data'] = tmp_list
       return result
    
 async def do_daq(devDesc, data, logger=my_logger):
@@ -95,7 +95,7 @@ async def do_daq(devDesc, data, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      result['status'] = 'ERROR'
+      result['success'] = False
       result['data'] = str(e)
       return result
    else:
@@ -109,8 +109,8 @@ async def do_daq(devDesc, data, logger=my_logger):
          tmp_list.append(tmp)
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
-      result['status'] = 'OK'
-      result['result'] = tmp_list
+      result['success'] = True
+      result['data'] = tmp_list
       return result
 
 async def doi_daq(devDesc, portList, logger=my_logger):
@@ -124,7 +124,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      result['status'] = 'ERROR'
+      result['success'] = False
       result['data'] = str(e)
       return result
    else:
@@ -139,8 +139,8 @@ async def doi_daq(devDesc, portList, logger=my_logger):
          tmp_list.append(tmp)
       logger.info('### Finished reading digital output data ###')
       instantDoCtrl.dispose()
-      result['status'] = 'OK'
-      result['result'] = tmp_list
+      result['success'] = True
+      result['data'] = tmp_list
       return result
 
 async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
@@ -154,8 +154,8 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      result['status'] = 'ERROR'
-      result['result'] = str(e)
+      result['success'] = False
+      result['data'] = str(e)
       return result
    else:
       tmp_list = []
@@ -169,8 +169,8 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
          tmp_list.append(tmp)
       logger.info('### Finished reading analog input data ###')
       instanceAiObj.dispose()
-      result['status'] = 'OK'
-      result['result'] = tmp_list
+      result['success'] = True
+      result['data'] = tmp_list
       return result
 
 async def ao_daq(devDesc, data, logger=my_logger):
@@ -183,7 +183,7 @@ async def ao_daq(devDesc, data, logger=my_logger):
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
       logger.error(e)
-      result['status'] = 'ERROR'
+      result['success'] = False
       result['data'] = str(e)
       return result
    else:
@@ -197,8 +197,8 @@ async def ao_daq(devDesc, data, logger=my_logger):
          tmp_list.append(tmp)
       logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
-      result['status'] = 'OK'
-      result['result'] = tmp_list
+      result['success'] = True
+      result['data'] = tmp_list
       return result
       
 '''INFLUXDB Function'''
