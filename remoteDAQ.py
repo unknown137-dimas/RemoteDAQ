@@ -13,7 +13,9 @@ from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
 from multiprocessing import Pool
 import asyncio
-from fastapi import FastAPI, Body, Header
+from fastapi import FastAPI, Body
+from pydantic import BaseModel
+import uvicorn
 
 # InfluxDB connection Config
 bucket = 'remote-data-acquisition' # CHANGE THIS
@@ -254,6 +256,9 @@ async def main():
 '''API'''
 app = FastAPI()
 
+class data(BaseModel):
+   data: list
+   
 @app.get('/ping')
 async def ping():
     return 'pong!!!'
@@ -274,11 +279,14 @@ async def get_digital_output_input():
    return result
 
 @app.put('/analog/output')
-async def set_analog_output(data: list = Body(embed=True)):
-   result = await ao_daq(devDesc, data)
+async def set_analog_output(data: data = Body(example={'data':[1.2, 3.4]})):
+   result = await ao_daq(devDesc, data.data)
    return result
 
 @app.put('/digital/output')
-async def set_digital_output(data: list = Body(embed=True)):
-   result = await do_daq(devDesc, data)
+async def set_digital_output(data: data = Body(example={'data':[0, 1, 0, 0, 0, 1, 0, 0]})):
+   result = await do_daq(devDesc, data.data)
    return result
+
+if __name__ == '__main__':
+   uvicorn.run('remoteDAQ:app', reload=True)
