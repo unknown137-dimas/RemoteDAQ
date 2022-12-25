@@ -205,29 +205,6 @@ def send_to_influxdb(url, token, org, bucket, data):
          write_client.write(bucket, data)
          my_logger.info('### Finished Sending input data to DB ###')
 
-'''Multiprocessing Function'''
-def smap(f, *arg):
-    return f(*arg)
-
-def parallel(proc_list):
-   with Pool() as pool:
-      x = pool.starmap_async(smap, proc_list)
-      print(x.get())
-      pool.close()
-      pool.join()
-
-async def sub_process_1():
-   di = await di_daq(devDesc, portList)
-   doi = await doi_daq(devDesc, portList)
-   ai = await ai_daq(devDesc, portList)
-   return {1:di, 2:doi, 3:ai}
-
-async def main():
-   output = await asyncio.gather(sub_process_1())
-   # with open('result.txt', 'w') as res:
-   #    for out in output:
-   #       res.writelines(json.dumps(out))
-
 '''API'''
 app = FastAPI()
 
