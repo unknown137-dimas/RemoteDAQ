@@ -37,17 +37,13 @@ LOG_FILE = 'remoteDAQ.log'
 
 '''Log Function'''
 def get_file_handler():
-   '''
-   Log File Handler
-   '''
+   '''Log File Handler'''
    file_handler = TimedRotatingFileHandler(LOG_FILE, when='midnight')
    file_handler.setFormatter(FORMATTER)
    return file_handler
 
 def get_logger(logger_name):
-   '''
-   Main Log Handler
-   '''
+   '''Main Log Handler'''
    logger = logging.getLogger(logger_name)
    logger.setLevel(logging.DEBUG)
    logger.addHandler(get_file_handler())
@@ -56,11 +52,8 @@ def get_logger(logger_name):
 
 my_logger = get_logger('remoteDAQ')
 
-'''DAQ Function'''
+'''Function to Read Digital Input Signal'''
 async def di_daq(devDesc, portList, logger=my_logger):
-   '''
-   Function to Read Digital Input Signal
-   '''
    logger.info('### Starting reading digital input data ###')
    measurement_name = 'digitalInput'
    result = {}
@@ -69,7 +62,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
    except ValueError as e:
       logger.error(e)
       result['success'] = False
-      result['data'] = str(e)
+      result['data'] = [str(e)]
       return result
    else:
       tmp_list = []
@@ -87,10 +80,8 @@ async def di_daq(devDesc, portList, logger=my_logger):
       result['data'] = tmp_list
       return result
    
+'''Function to Write Digital Output Signal'''
 async def do_daq(devDesc, data, logger=my_logger):
-   '''
-   Function to Write Digital Output Signal
-   '''
    logger.info('### Starting writing digital output data ###')
    result = {}
    try:
@@ -98,7 +89,7 @@ async def do_daq(devDesc, data, logger=my_logger):
    except ValueError as e:
       logger.error(e)
       result['success'] = False
-      result['data'] = str(e)
+      result['data'] = [str(e)]
       return result
    else:
       tmp_list = []
@@ -115,10 +106,8 @@ async def do_daq(devDesc, data, logger=my_logger):
       result['data'] = tmp_list
       return result
 
+'''Function to Read Digital Output Signal'''
 async def doi_daq(devDesc, portList, logger=my_logger):
-   '''
-   Function to Read Digital Output Signal
-   '''
    logger.info('### Starting reading digital output data ###')
    measurement_name = 'digitalOutputValue'
    result = {}
@@ -127,7 +116,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
    except ValueError as e:
       logger.error(e)
       result['success'] = False
-      result['data'] = str(e)
+      result['data'] = [str(e)]
       return result
    else:
       tmp_list = []
@@ -145,10 +134,8 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       result['data'] = tmp_list
       return result
 
+'''Function to Read Analog Input Signal'''
 async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
-   '''
-   Function to Read Analog Input Signal
-   '''
    logger.info('### Starting reading analog input data ###')
    measurement_name = 'analogInput'
    result = {}
@@ -157,7 +144,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
    except ValueError as e:
       logger.error(e)
       result['success'] = False
-      result['data'] = str(e)
+      result['data'] = [str(e)]
       return result
    else:
       tmp_list = []
@@ -175,10 +162,8 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       result['data'] = tmp_list
       return result
 
+'''Function to Write Analog Output Signal'''
 async def ao_daq(devDesc, data, logger=my_logger):
-   '''
-   Function to Write Analog Output Signal
-   '''
    logger.info('### Starting writing analog output data ###')
    result = {}
    try:
@@ -186,7 +171,7 @@ async def ao_daq(devDesc, data, logger=my_logger):
    except ValueError as e:
       logger.error(e)
       result['success'] = False
-      result['data'] = str(e)
+      result['data'] = [str(e)]
       return result
    else:
       tmp_list = []
@@ -203,29 +188,19 @@ async def ao_daq(devDesc, data, logger=my_logger):
       result['data'] = tmp_list
       return result
       
-'''INFLUXDB Function'''
+'''Create an InfluxDB Dictionary'''
 def line_protocol(measurement_name, port, value, id):
-   '''
-   Create an InfluxDB Dictionary
-   '''
-   return '{measurement},nodeID={id},port={port} value={val}'.format(measurement=measurement_name,
-      id=id,
-      port=port,
-      val=value)
+   return '{measurement},nodeID={id},port={port} value={val}'.format(
+         measurement=measurement_name,
+         id=id,
+         port=port,
+         val=value
+      )
 
+'''Send Data to InfluxDB'''
 def send_to_influxdb(url, token, org, bucket, data):
-   '''
-   Send Data to InfluxDB
-   '''
    with InfluxDBClient(url, token, org) as client:
-      with client.write_api(write_options=WriteOptions(batch_size=1,
-                                                      flush_interval=10_000,
-                                                      jitter_interval=2_000,
-                                                      retry_interval=1_000,
-                                                      max_retries=3,
-                                                      max_retry_delay=10_000,
-                                                      exponential_base=2)) as write_client:
-         
+      with client.write_api() as write_client:
          my_logger.info('### Starting Sending input data to DB ###')
          write_client.write(bucket, data)
          my_logger.info('### Finished Sending input data to DB ###')
