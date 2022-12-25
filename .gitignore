@@ -3,7 +3,7 @@
 Automation/BDaq/__pycache__/*
 __pycache__/*
 Automation/__pycache__/*
-*_example.py
+examples/*
 delete_data.py
 device_features_settings.py
 remoteDAQ.log*
