@@ -14,7 +14,6 @@ class request_data(BaseModel):
 
 '''Response Model'''
 class response_data(BaseModel):
-    measurement_name: str
     port: str
     data: str
 
