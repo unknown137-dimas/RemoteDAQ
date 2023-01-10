@@ -2,6 +2,7 @@
 from uuid import uuid3, NAMESPACE_DNS
 from socket import gethostname
 from influxdb_client.client.influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import ASYNCHRONOUS
 from datetime import datetime
 import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
@@ -13,7 +14,7 @@ url='http://192.168.117.132:8086' # CHANGE THIS
 token = 'PXCJT5naU4g1R04-b9U_MtMBFLYkimD4-QZ0GyswJiBwov7MzOMj_ABppwuxvNXIK2HknQnp_qrVYXLfwY2cww=='  # CHANGE THIS
 bucket = 'remote-data-acquisition' # CHANGE THIS
 org = 'UGM' # CHANGE THIS
-send_to_db = False
+send_to_db = True
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
@@ -44,9 +45,9 @@ def send_to_influxdb(
    logger=my_logger
    ):
    with InfluxDBClient(url, token, org) as client:
-      with client.write_api() as write_client:
+      with client.write_api(write_options=ASYNCHRONOUS) as write_client:
          logger.info('### Starting Sending input data to DB ###')
-         write_client.write(bucket, data)
+         write_client.write(bucket, org, data)
 
 '''Main Function'''
 async def main(devDesc, portList):
@@ -66,19 +67,19 @@ async def main(devDesc, portList):
          measurement_name = 'analogInput',
          id=dev_id,
          port=ai_result['port'],
-         value=ai_result['value']
+         value=ai_result['data']
       )
       di_tmp_upload = line_protocol(
          measurement_name = 'digitalInput',
          id=dev_id,
          port=di_result['port'],
-         value=di_result['value']
+         value=di_result['data']
       )
       doi_tmp_upload = line_protocol(
          measurement_name = 'digitalOutputValue',
          id=dev_id,
          port=doi_result['port'],
-         value=doi_result['value']
+         value=doi_result['data']
       )
       
       ai_upload.append(ai_tmp_upload)
@@ -95,5 +96,6 @@ if __name__ == '__main__':
         check = datetime.now()
         diff = check - now
         if diff.total_seconds() > 5:
+            print('Sending Data...')
             asyncio.run(main(devDesc, portList))
             now = check
