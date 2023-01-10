@@ -13,7 +13,6 @@ my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ')
 '''Function to Read Analog Input Signal'''
 async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
    logger.info('### Starting reading analog input data ###')
-   measurement_name = 'analogInput'
    result = {}
    try:
       instanceAiObj = InstantAiCtrl(devDesc)
@@ -28,7 +27,6 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
          tmp = {}
          _, scaledData = instanceAiObj.readDataF64(i, 1)
          logger.info('Successfully read analog input port #' + str(i))
-         tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = round(scaledData[0], decimalPrecision)
          tmp_list.append(tmp)
@@ -41,7 +39,6 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
 '''Function to Read Digital Input Signal'''
 async def di_daq(devDesc, portList, logger=my_logger):
    logger.info('### Starting reading digital input data ###')
-   measurement_name = 'digitalInput'
    result = {}
    try:
       instantDiCtrl = InstantDiCtrl(devDesc)
@@ -56,7 +53,6 @@ async def di_daq(devDesc, portList, logger=my_logger):
          tmp = {}
          _, data = instantDiCtrl.readBit(0, i)
          logger.info('Successfully read digital input port #' + str(i))
-         tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = data
          tmp_list.append(tmp)
@@ -69,7 +65,6 @@ async def di_daq(devDesc, portList, logger=my_logger):
 '''Function to Read Digital Output Signal'''
 async def doi_daq(devDesc, portList, logger=my_logger):
    logger.info('### Starting reading digital output data ###')
-   measurement_name = 'digitalOutputValue'
    result = {}
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
@@ -84,7 +79,6 @@ async def doi_daq(devDesc, portList, logger=my_logger):
          tmp = {}
          _, data = instantDoCtrl.readBit(0, i)
          logger.info('Successfully read digital output port #' + str(i))
-         tmp['measurement_name'] = measurement_name
          tmp['port'] = i
          tmp['data'] = data
          tmp_list.append(tmp)

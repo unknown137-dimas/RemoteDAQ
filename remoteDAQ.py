@@ -63,19 +63,19 @@ async def main(devDesc, portList):
       doi_result = doi_results['data'][i]
       
       ai_tmp_upload = line_protocol(
-         measurement_name=ai_result['measurement_name'],
+         measurement_name = 'analogInput',
          id=dev_id,
          port=ai_result['port'],
          value=ai_result['value']
       )
       di_tmp_upload = line_protocol(
-         measurement_name=di_result['measurement_name'],
+         measurement_name = 'digitalInput',
          id=dev_id,
          port=di_result['port'],
          value=di_result['value']
       )
       doi_tmp_upload = line_protocol(
-         measurement_name=doi_result['measurement_name'],
+         measurement_name = 'digitalOutputValue',
          id=dev_id,
          port=doi_result['port'],
          value=doi_result['value']
