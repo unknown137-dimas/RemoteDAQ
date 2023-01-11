@@ -1,0 +1,14 @@
+version: '3'
+services:
+  remotedaq:
+    image: remotedaq_node
+    container_name: remotedaq_node
+    build: .
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ${PWD}/remoteDAQ_DB_Upload.py:/remoteDAQ_DB_Upload.py:ro
+      - ${PWD}/remoteDAQ_Logger.py:/remoteDAQ_Logger.py:ro
+      - ${PWD}/remoteDAQ_USB.py:/remoteDAQ_USB.py:ro
+      - ${PWD}/remoteDAQ.py:/remoteDAQ.py:ro
