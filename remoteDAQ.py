@@ -4,8 +4,8 @@ import uvicorn
 from remoteDAQ_USB import ai_daq, ao_daq, di_daq, do_daq, doi_daq
 from remoteDAQ_DB_Upload import main, url, bucket, org, token
 import asyncio
-from apscheduler.schedulers.background import BlockingScheduler
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
+from threading import Thread
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
@@ -57,7 +57,10 @@ async def set_digital_output(data: request_data = Body(example={'data':[0, 1, 0,
    return result
 
 if __name__ == '__main__':
-   sched = AsyncIOScheduler()
+   sched = BackgroundScheduler()
    sched.add_job(lambda: asyncio.run(main(devDesc, portList)), 'interval', seconds=5)
    sched.start()
-   uvicorn.run('remoteDAQ_API:app', reload=True)
+   t = Thread(uvicorn.run('remoteDAQ:app'))
+   t.start()
+   
+   
