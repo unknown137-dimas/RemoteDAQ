@@ -12,3 +12,5 @@ services:
       - ${PWD}/remoteDAQ_Logger.py:/remoteDAQ_Logger.py:ro
       - ${PWD}/remoteDAQ_USB.py:/remoteDAQ_USB.py:ro
       - ${PWD}/remoteDAQ.py:/remoteDAQ.py:ro
+    devices:
+      - '/dev/ttyUSB0'
