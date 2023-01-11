@@ -1,6 +1,5 @@
 import sys
 sys.path.append('..')
-from Automation.BDaq import *
 from Automation.BDaq.InstantDiCtrl import InstantDiCtrl
 from Automation.BDaq.InstantDoCtrl import InstantDoCtrl
 from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
@@ -8,7 +7,7 @@ from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
 import remoteDAQ_Logger
 
 #Logger Config
-my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ')
+my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_USB')
 
 '''Function to Read Analog Input Signal'''
 async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
