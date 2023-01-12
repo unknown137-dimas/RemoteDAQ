@@ -1,6 +1,6 @@
 version: '3'
 services:
-  remotedaq:
+  node:
     image: remotedaq_node
     container_name: remotedaq_node
     build: .
