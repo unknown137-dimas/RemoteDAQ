@@ -39,7 +39,7 @@ def send_to_influxdb(
    ):
    with InfluxDBClient(url, token, org) as client:
       with client.write_api(write_options=ASYNCHRONOUS) as write_client:
-         logger.info('### Starting Sending input data to DB ###')
+         logger.info('### Sending Data to DB ###')
          write_client.write(bucket, org, data)
 
 '''Main Function'''
@@ -53,14 +53,17 @@ async def main(devDesc, portList):
    
    for r in range(len(daq_results)):
       upload = []
-      for i in portList:
-         result = daq_results[r]['data'][i]
-         tmp_upload = line_protocol(
-            measurement_name = measurement_name[r],
-            id=dev_id,
-            port=result['port'],
-            value=result['data']
-         )
-         upload.append(tmp_upload)
-      print('Sending Data to DB...')
-      send_to_influxdb(data=upload)
+      if daq_results[r]['success']:
+         for i in portList:
+            result = daq_results[r]['data'][i]
+            tmp_upload = line_protocol(
+               measurement_name = measurement_name[r],
+               id=dev_id,
+               port=result['port'],
+               value=result['data']
+            )
+            upload.append(tmp_upload)
+         send_to_influxdb(data=upload)
+         my_logger.info('### Successfully Sending Data to DB ###')
+      else:
+         my_logger.error('### Error detected, Check DAQ connection ###')
