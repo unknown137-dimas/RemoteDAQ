@@ -46,12 +46,12 @@ async def get_digital_output_input():
    result = await doi_daq(devDesc, portList)
    return result
 
-@app.put('/analog/output', response_model=response, response_model_exclude={'measurement_name'})
+@app.put('/analog/output', response_model=response)
 async def set_analog_output(data: request_data = Body(example={'data':[1.2, 3.4]})):
    result = await ao_daq(devDesc, data.data)
    return result
 
-@app.put('/digital/output', response_model=response, response_model_exclude={'measurement_name'})
+@app.put('/digital/output', response_model=response)
 async def set_digital_output(data: request_data = Body(example={'data':[0, 1, 0, 0, 0, 1, 0, 0]})):
    result = await do_daq(devDesc, data.data)
    return result
@@ -60,7 +60,7 @@ if __name__ == '__main__':
    sched = BackgroundScheduler()
    sched.add_job(lambda: asyncio.run(main(devDesc, portList)), 'interval', seconds=5)
    sched.start()
-   t = Thread(uvicorn.run('remoteDAQ:app'))
+   t = Thread(uvicorn.run('remoteDAQ:app', host='0.0.0.0'))
    t.start()
    
    
