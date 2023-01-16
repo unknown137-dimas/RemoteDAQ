@@ -10,9 +10,4 @@ services:
     volumes:
       - ./daq-drivers/advantech/libs/libbiodaq.so:/usr/lib/libbiodaq.so:ro
       - ./daq-drivers/advantech/libs/libbiodaqutil.so:/usr/lib/libbiodaqutil.so:ro
-      - ./remoteDAQ_DB_Upload.py:/remoteDAQ_DB_Upload.py:ro
-      - ./remoteDAQ_Logger.py:/remoteDAQ_Logger.py:ro
-      - ./remoteDAQ_USB.py:/remoteDAQ_USB.py:ro
-      - ./remoteDAQ.py:/remoteDAQ.py:ro
-    devices:
-      - /dev/bus/usb:/dev/bus/usb
+    privileged: true
