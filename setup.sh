@@ -1,8 +1,15 @@
 #!/bin/bash
 
-#Install Zerotier Client
-curl -s https://install.zerotier.com | sudo bash
-zerotier-cli join $1
+#Check Shell Argument
+if [[ $# -eq 0 ]]
+then
+    echo 'No Zerotier ID supplied'
+    exit 1
+else
 
-#Deploy
-docker-compose up -d
+    #Join Zerotier Network
+    sudo zerotier-cli join $1
+    
+    #Deploy
+    docker-compose up -d
+fi
