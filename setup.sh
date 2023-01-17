@@ -3,7 +3,7 @@
 #Check Shell Argument
 if [[ $# -eq 0 ]]
 then
-    echo 'No Zerotier ID supplied'
+    echo 'No Zerotier Network ID supplied'
     exit 1
 else
 
