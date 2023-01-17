@@ -19,7 +19,7 @@ my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 # Node Config
 dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
       
-'''Create an InfluxDB Dictionary'''
+'''Create an InfluxDB Line Protocol Format'''
 def line_protocol(measurement_name, id, port, value):
    return '{measurement},nodeID={id},port={port} value={val}'.format(
          measurement=measurement_name,
