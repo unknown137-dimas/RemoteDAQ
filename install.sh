@@ -16,4 +16,4 @@ curl -s https://install.zerotier.com | sudo bash
 
 #Install Advantech DAQ Driver
 sudo chmod +x ./DAQ-Drivers/Advantech/linux_driver_source_*_64bit.run
-sudo ./linux_driver_source_*_64bit.run
+sudo ./daq-drivers/advantech/linux_driver_source_*_64bit.run silent install usb4702_usb4704
