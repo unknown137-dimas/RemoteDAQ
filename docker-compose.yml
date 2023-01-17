@@ -5,6 +5,11 @@ services:
     container_name: remotedaq_node
     build: .
     restart: always
+    environment:
+      - INFLUXDB_IP=${INFLUXDB_IP}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
     ports:
       - 8000:8000
     volumes:
