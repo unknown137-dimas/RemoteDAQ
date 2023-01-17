@@ -1,8 +1,9 @@
+from socket import gethostname
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 import uvicorn
 from remoteDAQ_USB import ai_daq, ao_daq, di_daq, do_daq, doi_daq
-from remoteDAQ_DB_Upload import main, url, bucket, org, token
+from remoteDAQ_DB_Upload import main
 import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Thread
@@ -30,6 +31,10 @@ app = FastAPI()
 @app.get('/ping')
 async def ping():
     return 'pong!!!'
+
+@app.get('/node_info')
+async def node_info():
+    return gethostname()
 
 @app.get('/analog/input', response_model=response)
 async def get_analog_input():
