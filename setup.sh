@@ -11,5 +11,5 @@ else
     sudo zerotier-cli join $1
     
     #Deploy
-    docker-compose up -d
+    sudo docker-compose up -d
 fi

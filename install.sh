@@ -13,3 +13,7 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plu
 
 #Install Zerotier Client
 curl -s https://install.zerotier.com | sudo bash
+
+#Install Advantech DAQ Driver
+sudo chmod +x ./DAQ-Drivers/Advantech/linux_driver_source_*_64bit.run
+sudo ./linux_driver_source_*_64bit.run
