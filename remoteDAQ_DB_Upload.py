@@ -8,10 +8,10 @@ import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 
 # InfluxDB Client Config
-url='http://192.168.117.132:8086' # CHANGE THIS
-token = str(getenv('INFLUXDB_TOKEN'))  # CHANGE THIS
-bucket = 'remote-data-acquisition' # CHANGE THIS
-org = 'UGM' # CHANGE THIS
+url=str(getenv('INFLUXDB_IP'))
+token = str(getenv('INFLUXDB_TOKEN'))
+org = str(getenv('INFLUXDB_ORG'))
+bucket = str(getenv('INFLUXDB_BUCKET'))
 
 #Logger Config
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
