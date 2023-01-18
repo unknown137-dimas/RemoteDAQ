@@ -12,7 +12,4 @@ services:
       - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
     ports:
       - 8000:8000
-    volumes:
-      - ./daq-drivers/advantech/libs/libbiodaq.so:/usr/lib/libbiodaq.so:ro
-      - ./daq-drivers/advantech/libs/libbiodaqutil.so:/usr/lib/libbiodaqutil.so:ro
     privileged: true
