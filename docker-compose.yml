@@ -6,6 +6,7 @@ services:
     build: .
     restart: always
     environment:
+      - HOSTNAME=${HOSTNAME}
       - INFLUXDB_IP=${INFLUXDB_IP}
       - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
       - INFLUXDB_ORG=${INFLUXDB_ORG}

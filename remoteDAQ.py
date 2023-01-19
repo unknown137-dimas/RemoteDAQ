@@ -1,4 +1,4 @@
-from socket import gethostname
+from os import getenv
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 import uvicorn
@@ -34,7 +34,7 @@ async def ping():
 
 @app.get('/node_info')
 async def node_info():
-    return gethostname()
+    return getenv('HOSTNAME')
 
 @app.get('/analog/input', response_model=response)
 async def get_analog_input():
