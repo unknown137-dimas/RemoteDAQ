@@ -60,7 +60,7 @@ async def main(devDesc, portList):
                measurement_name = measurement_name[r],
                id=dev_id,
                port=result['port'],
-               value=result['data']
+               value=result['value']
             )
             upload.append(tmp_upload)
          send_to_influxdb(data=upload)

@@ -27,7 +27,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
          _, scaledData = instanceAiObj.readDataF64(i, 1)
          logger.info('Successfully read analog input port #' + str(i))
          tmp['port'] = i
-         tmp['data'] = round(scaledData[0], decimalPrecision)
+         tmp['value'] = round(scaledData[0], decimalPrecision)
          tmp_list.append(tmp)
       logger.info('### Finished reading analog input data ###')
       instanceAiObj.dispose()
@@ -53,7 +53,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
          _, data = instantDiCtrl.readBit(0, i)
          logger.info('Successfully read digital input port #' + str(i))
          tmp['port'] = i
-         tmp['data'] = data
+         tmp['value'] = data
          tmp_list.append(tmp)
       logger.info('### Finished reading digital input data ###')
       instantDiCtrl.dispose()
@@ -79,7 +79,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
          _, data = instantDoCtrl.readBit(0, i)
          logger.info('Successfully read digital output port #' + str(i))
          tmp['port'] = i
-         tmp['data'] = data
+         tmp['value'] = data
          tmp_list.append(tmp)
       logger.info('### Finished reading digital output data ###')
       instantDoCtrl.dispose()
@@ -88,7 +88,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       return result
 
 '''Function to Write Analog Output Signal'''
-async def ao_daq(devDesc, data, logger=my_logger):
+async def ao_daq(devDesc, value, logger=my_logger):
    logger.info('### Starting writing analog output data ###')
    result = {}
    try:
@@ -100,12 +100,12 @@ async def ao_daq(devDesc, data, logger=my_logger):
       return result
    else:
       tmp_list = []
-      for i in range(len(data)):
+      for i in range(len(value)):
          tmp = {}
-         _ = instantAoCtrl.writeAny(i, 1, None, [data[i]])
+         _ = instantAoCtrl.writeAny(i, 1, None, [value[i]])
          logger.info('Successfully write analog output port #' + str(i))
          tmp['port'] = i
-         tmp['data'] = data[i]
+         tmp['value'] = value[i]
          tmp_list.append(tmp)
       logger.info('### Finished writing analog output data ###')
       instantAoCtrl.dispose()
@@ -114,7 +114,7 @@ async def ao_daq(devDesc, data, logger=my_logger):
       return result
    
 '''Function to Write Digital Output Signal'''
-async def do_daq(devDesc, data, logger=my_logger):
+async def do_daq(devDesc, value, logger=my_logger):
    logger.info('### Starting writing digital output data ###')
    result = {}
    try:
@@ -126,12 +126,12 @@ async def do_daq(devDesc, data, logger=my_logger):
       return result
    else:
       tmp_list = []
-      for i in range(len(data)):
+      for i in range(len(value)):
          tmp = {}
-         _ = instantDoCtrl.writeBit(0, i, data[i])
+         _ = instantDoCtrl.writeBit(0, i, value[i])
          logger.info('Successfully write digital output port #' + str(i))
          tmp['port'] = i
-         tmp['data'] = data[i]
+         tmp['value'] = value[i]
          tmp_list.append(tmp)
       logger.info('### Finished writing digital output data ###')
       instantDoCtrl.dispose()
