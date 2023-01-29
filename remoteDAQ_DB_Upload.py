@@ -8,7 +8,7 @@ import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 
 # InfluxDB Client Config
-url=str(getenv('INFLUXDB_IP'))
+url = str(getenv('INFLUXDB_IP'))
 token = str(getenv('INFLUXDB_TOKEN'))
 org = str(getenv('INFLUXDB_ORG'))
 bucket = str(getenv('INFLUXDB_BUCKET'))
@@ -17,12 +17,14 @@ bucket = str(getenv('INFLUXDB_BUCKET'))
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 
 # Node Config
-dev_id = str(uuid3(NAMESPACE_DNS, gethostname()))
+hostname = gethostname()
+dev_id = str(uuid3(NAMESPACE_DNS, hostname))
       
 '''Create an InfluxDB Line Protocol Format'''
-def line_protocol(measurement_name, id, port, value):
-   return '{measurement},nodeID={id},port={port} value={val}'.format(
+def line_protocol(measurement_name, node, id, port, value):
+   return '{measurement},node={node},nodeID={id},port={port} value={val}'.format(
          measurement=measurement_name,
+         node=node,
          id=id,
          port=port,
          val=value
@@ -41,6 +43,8 @@ def send_to_influxdb(
       with client.write_api(write_options=ASYNCHRONOUS) as write_client:
          logger.info('### Sending Data to DB ###')
          write_client.write(bucket, org, data)
+         logger.info('### Successfully Sending Data to DB ###')
+
 
 '''Main Function'''
 async def main(devDesc, portList):
@@ -58,12 +62,12 @@ async def main(devDesc, portList):
             result = daq_results[r]['data'][i]
             tmp_upload = line_protocol(
                measurement_name = measurement_name[r],
+               node=hostname,
                id=dev_id,
                port=result['port'],
                value=result['value']
             )
             upload.append(tmp_upload)
          send_to_influxdb(data=upload)
-         my_logger.info('### Successfully Sending Data to DB ###')
       else:
          my_logger.error('### Error detected, Check DAQ connection ###')
