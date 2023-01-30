@@ -16,6 +16,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
    try:
       instanceAiObj = InstantAiCtrl(devDesc)
    except ValueError as e:
+      logger.error('### Error detected, Check DAQ connection ###')
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
@@ -25,7 +26,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       for i in portList:
          tmp = {}
          _, scaledData = instanceAiObj.readDataF64(i, 1)
-         logger.info('Successfully read analog input port #' + str(i))
+         logger.info(f'Successfully read analog input port #{i}')
          tmp['port'] = i
          tmp['value'] = round(scaledData[0], decimalPrecision)
          tmp_list.append(tmp)
@@ -42,6 +43,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
    try:
       instantDiCtrl = InstantDiCtrl(devDesc)
    except ValueError as e:
+      logger.error('### Error detected, Check DAQ connection ###')
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
@@ -51,7 +53,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       for i in portList:
          tmp = {}
          _, data = instantDiCtrl.readBit(0, i)
-         logger.info('Successfully read digital input port #' + str(i))
+         logger.info(f'Successfully read digital input port #{i}')
          tmp['port'] = i
          tmp['value'] = data
          tmp_list.append(tmp)
@@ -68,6 +70,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
+      logger.error('### Error detected, Check DAQ connection ###')
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
@@ -77,7 +80,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       for i in portList:
          tmp = {}
          _, data = instantDoCtrl.readBit(0, i)
-         logger.info('Successfully read digital output port #' + str(i))
+         logger.info(f'Successfully read digital output port #{i}')
          tmp['port'] = i
          tmp['value'] = data
          tmp_list.append(tmp)
@@ -94,6 +97,7 @@ async def ao_daq(devDesc, value, logger=my_logger):
    try:
       instantAoCtrl = InstantAoCtrl(devDesc)
    except ValueError as e:
+      logger.error('### Error detected, Check DAQ connection ###')
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
@@ -103,7 +107,7 @@ async def ao_daq(devDesc, value, logger=my_logger):
       for i in range(len(value)):
          tmp = {}
          _ = instantAoCtrl.writeAny(i, 1, None, [value[i]])
-         logger.info('Successfully write analog output port #' + str(i))
+         logger.info(f'Successfully write analog output port #{i}')
          tmp['port'] = i
          tmp['value'] = value[i]
          tmp_list.append(tmp)
@@ -120,6 +124,7 @@ async def do_daq(devDesc, value, logger=my_logger):
    try:
       instantDoCtrl = InstantDoCtrl(devDesc)
    except ValueError as e:
+      logger.error('### Error detected, Check DAQ connection ###')
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
@@ -129,7 +134,7 @@ async def do_daq(devDesc, value, logger=my_logger):
       for i in range(len(value)):
          tmp = {}
          _ = instantDoCtrl.writeBit(0, i, value[i])
-         logger.info('Successfully write digital output port #' + str(i))
+         logger.info(f'Successfully write digital output port #{i}')
          tmp['port'] = i
          tmp['value'] = value[i]
          tmp_list.append(tmp)

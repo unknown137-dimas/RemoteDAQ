@@ -3,7 +3,8 @@ from os import getenv
 from uuid import uuid3, NAMESPACE_DNS
 from socket import gethostname
 from influxdb_client.client.influxdb_client import InfluxDBClient
-from influxdb_client.client.write_api import ASYNCHRONOUS
+from influxdb_client.client.exceptions import InfluxDBError
+from influxdb_client.client.write_api import SYNCHRONOUS
 import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 
@@ -30,21 +31,32 @@ def line_protocol(measurement_name, node, id, port, value):
          val=value
       )
 
+'''InfluxDB Callback'''
+class db_callback():
+   '''Success Callback'''
+   def success(self, conf, data):
+        my_logger.info('### Successfully Sending Data to DB ###')
+   '''Error Callback'''
+   def error(self, conf, data, exception: InfluxDBError):
+        my_logger.error(f'### Error occurs, Error message: {exception} ###')
+   '''Retry Callback'''
+   def retry(self, conf, data, exception: InfluxDBError):
+        my_logger.error(f'### Retryable error occurs, Error message: {exception} ###')
+callback = db_callback()
+
 '''Send Data to InfluxDB'''
 def send_to_influxdb(
    url=url,
    token=token,
    org=org,
    bucket=bucket,
-   data=[],
-   logger=my_logger
+   data=[]
    ):
-   with InfluxDBClient(url, token, org) as client:
-      with client.write_api(write_options=ASYNCHRONOUS) as write_client:
-         logger.info('### Sending Data to DB ###')
+   with InfluxDBClient(url, token, org=org) as client:
+      with client.write_api(success_callback=callback.success,
+                            error_callback=callback.error,
+                            retry_callback=callback.retry) as write_client:
          write_client.write(bucket, org, data)
-         logger.info('### Successfully Sending Data to DB ###')
-
 
 '''Main Function'''
 async def main(devDesc, portList):
@@ -55,8 +67,8 @@ async def main(devDesc, portList):
          ]
    measurement_name = ['analogInput', 'digitalInput', 'digitalOutputValue']
    
+   upload = []
    for r in range(len(daq_results)):
-      upload = []
       if daq_results[r]['success']:
          for i in portList:
             result = daq_results[r]['data'][i]
@@ -68,6 +80,5 @@ async def main(devDesc, portList):
                value=result['value']
             )
             upload.append(tmp_upload)
-         send_to_influxdb(data=upload)
-      else:
-         my_logger.error('### Error detected, Check DAQ connection ###')
+   my_logger.info('### Sending Data to DB ###')
+   send_to_influxdb(data=upload)
