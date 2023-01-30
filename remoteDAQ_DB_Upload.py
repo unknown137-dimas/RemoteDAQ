@@ -18,7 +18,7 @@ bucket = str(getenv('INFLUXDB_BUCKET'))
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 
 # Node Config
-hostname = gethostname()
+hostname = str(getenv('HOSTNAME'))
 dev_id = str(uuid3(NAMESPACE_DNS, hostname))
       
 '''Create an InfluxDB Line Protocol Format'''
