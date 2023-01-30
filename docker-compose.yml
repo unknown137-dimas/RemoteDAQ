@@ -13,4 +13,6 @@ services:
       - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
     ports:
       - 8000:8000
+    volumes:
+      - ./remoteDAQ.py:/rdaq-node/remoteDAQ.py:ro
     privileged: true
