@@ -28,9 +28,9 @@ class response(BaseModel):
 
 app = FastAPI()
    
-@app.get('/ping')
-async def ping():
-    return 'pong!!!'
+@app.get('/health')
+async def health():
+    return 'OK'
 
 @app.get('/node_info')
 async def node_info():
