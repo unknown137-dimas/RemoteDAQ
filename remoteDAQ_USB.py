@@ -20,7 +20,6 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
-      return result
    else:
       tmp_list = []
       for i in portList:
@@ -34,7 +33,7 @@ async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
       instanceAiObj.dispose()
       result['success'] = True
       result['data'] = tmp_list
-      return result
+   return result
 
 '''Function to Read Digital Input Signal'''
 async def di_daq(devDesc, portList, logger=my_logger):
@@ -47,7 +46,6 @@ async def di_daq(devDesc, portList, logger=my_logger):
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
-      return result
    else:
       tmp_list = []
       for i in portList:
@@ -61,7 +59,7 @@ async def di_daq(devDesc, portList, logger=my_logger):
       instantDiCtrl.dispose()
       result['success'] = True
       result['data'] = tmp_list
-      return result
+   return result
 
 '''Function to Read Digital Output Signal'''
 async def doi_daq(devDesc, portList, logger=my_logger):
@@ -74,7 +72,6 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
-      return result
    else:
       tmp_list = []
       for i in portList:
@@ -88,7 +85,7 @@ async def doi_daq(devDesc, portList, logger=my_logger):
       instantDoCtrl.dispose()
       result['success'] = True
       result['data'] = tmp_list
-      return result
+   return result
 
 '''Function to Write Analog Output Signal'''
 async def ao_daq(devDesc, value, logger=my_logger):
@@ -101,7 +98,6 @@ async def ao_daq(devDesc, value, logger=my_logger):
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
-      return result
    else:
       tmp_list = []
       for i in range(len(value)):
@@ -115,7 +111,7 @@ async def ao_daq(devDesc, value, logger=my_logger):
       instantAoCtrl.dispose()
       result['success'] = True
       result['data'] = tmp_list
-      return result
+   return result
    
 '''Function to Write Digital Output Signal'''
 async def do_daq(devDesc, value, logger=my_logger):
@@ -128,7 +124,6 @@ async def do_daq(devDesc, value, logger=my_logger):
       logger.error(e)
       result['success'] = False
       result['data'] = [str(e)]
-      return result
    else:
       tmp_list = []
       for i in range(len(value)):
@@ -142,4 +137,4 @@ async def do_daq(devDesc, value, logger=my_logger):
       instantDoCtrl.dispose()
       result['success'] = True
       result['data'] = tmp_list
-      return result
+   return result

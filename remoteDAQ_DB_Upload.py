@@ -1,7 +1,6 @@
 
 from os import getenv
 from uuid import uuid3, NAMESPACE_DNS
-from socket import gethostname
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.write_api import SYNCHRONOUS
