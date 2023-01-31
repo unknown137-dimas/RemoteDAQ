@@ -1,16 +1,8 @@
 #!/bin/bash
 
-#Check Shell Argument
-if [[ $# -eq 0 ]]
-then
-    echo 'No Zerotier Network ID supplied'
-    exit 1
-else
+#Join Zerotier Network
+sudo zerotier-cli join $1
+echo HOSTNAME=$HOTSNAME > .env
 
-    #Join Zerotier Network
-    sudo zerotier-cli join $1
-    echo HOSTNAME=$HOTSNAME > .env
-    
-    #Deploy
-    sudo docker-compose up -d
-fi
+#Deploy
+sudo docker-compose up -d

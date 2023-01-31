@@ -1,12 +1,7 @@
 #!/bin/bash
 
-#User Input
-read -p 'Input wireless interface: ' wifi
-read -p 'Input Wi-Fi network name: ' ssid
-read -sp 'Input wifi password: ' pass
-
 #Create wpa_supplicant.conf File
-sudo wpa_passphrase $ssid $pass  | sudo tee /etc/wpa_supplicant.conf
+sudo wpa_passphrase $2 $3  | sudo tee /etc/wpa_supplicant.conf
 
 #Create wpa_supplicant.service File
 cat <<EOF > wpa_supplicant.service
@@ -20,7 +15,7 @@ IgnoreOnIsolate=true
 [Service]
 Type=dbus
 BusName=fi.w1.wpa_supplicant1
-ExecStart=/sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i $wifi
+ExecStart=/sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i $1
 Restart=always
 ExecReload=/bin/kill -HUP $MAINPID
 
@@ -37,8 +32,8 @@ After=wpa_supplicant.service
 
 [Service]
 Type=forking
-ExecStart=/sbin/dhclient $wifi -v
-ExecStop=/sbin/dhclient $wifi -r
+ExecStart=/sbin/dhclient $1 -v
+ExecStop=/sbin/dhclient $1 -r
 Restart=always
 
 [Install]
