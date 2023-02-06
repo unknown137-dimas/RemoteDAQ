@@ -4,6 +4,5 @@ Automation/BDaq/__pycache__/*
 __pycache__/*
 Automation/__pycache__/*
 examples/*
-delete_data.py
-device_features_settings.py
-remoteDAQ.log*
+logs/*
+.env
