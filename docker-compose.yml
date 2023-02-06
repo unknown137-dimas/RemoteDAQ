@@ -15,4 +15,5 @@ services:
       - 8000:8000
     volumes:
       - ./remoteDAQ.py:/rdaq-node/remoteDAQ.py:ro
+      - ./logs:/rdaq-node/logs
     privileged: true

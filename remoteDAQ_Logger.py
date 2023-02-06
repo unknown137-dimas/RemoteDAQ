@@ -3,7 +3,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 # Log Config
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
-LOG_FILE = 'remoteDAQ.log'
+LOG_FILE = 'logs/remoteDAQ.log'
 
 '''Log File Handler'''
 def get_file_handler():
