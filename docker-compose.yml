@@ -5,15 +5,10 @@ services:
     container_name: remotedaq_node
     build: .
     restart: always
-    environment:
-      - HOSTNAME=${HOSTNAME}
-      - INFLUXDB_IP=${INFLUXDB_IP}
-      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
-      - INFLUXDB_ORG=${INFLUXDB_ORG}
-      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
     ports:
       - 8000:8000
     volumes:
       - ./remoteDAQ.py:/rdaq-node/remoteDAQ.py:ro
+      - ./.env:/rdaq-node/.env:ro
       - ./logs:/rdaq-node/logs
     privileged: true

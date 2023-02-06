@@ -1,11 +1,15 @@
 
 from os import getenv
+from dotenv import load_dotenv
 from uuid import uuid3, NAMESPACE_DNS
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.write_api import SYNCHRONOUS
 import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
+
+# Load Variables
+load_dotenv()
 
 # InfluxDB Client Config
 url = str(getenv('INFLUXDB_IP'))

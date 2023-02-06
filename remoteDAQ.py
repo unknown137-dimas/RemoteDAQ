@@ -1,4 +1,5 @@
 from os import getenv
+from dotenv import load_dotenv
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 import uvicorn
@@ -7,6 +8,9 @@ from remoteDAQ_DB_Upload import main
 import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Thread
+
+# Load Variables
+load_dotenv()
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
@@ -19,12 +23,16 @@ class request_data(BaseModel):
 
 '''Response Model'''
 class response_data(BaseModel):
-    port: str
-    value: str
+   port: str
+   value: str
 
 class response(BaseModel):
-    success: bool
-    data: list[response_data]
+   success: bool
+   data: list[response_data]
+
+class node_info_response(BaseModel):
+   hostname: str
+   zt_id: str
 
 app = FastAPI()
    
@@ -32,9 +40,10 @@ app = FastAPI()
 async def health():
     return 'OK'
 
-@app.get('/node_info')
+@app.get('/node_info', response_model=node_info_response)
 async def node_info():
-    return getenv('HOSTNAME')
+    return node_info_response(hostname=str(getenv('HOSTNAME')),
+                              zt_id=str(getenv('ZT_ID')))
 
 @app.get('/analog/input', response_model=response)
 async def get_analog_input():
