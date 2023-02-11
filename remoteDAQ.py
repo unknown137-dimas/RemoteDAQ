@@ -35,10 +35,6 @@ class node_info_response(BaseModel):
    zt_id: str
 
 app = FastAPI()
-   
-@app.get('/health')
-async def health():
-    return 'OK'
 
 @app.get('/node_info', response_model=node_info_response)
 async def node_info():
