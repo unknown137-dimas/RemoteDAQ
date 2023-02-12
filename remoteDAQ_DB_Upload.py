@@ -12,10 +12,10 @@ from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 load_dotenv()
 
 # InfluxDB Client Config
-url = str(getenv('INFLUXDB_IP'))
-token = str(getenv('INFLUXDB_TOKEN'))
-org = str(getenv('INFLUXDB_ORG'))
-bucket = str(getenv('INFLUXDB_BUCKET'))
+url = str(getenv('DB_IP'))
+token = str(getenv('DB_TOKEN'))
+org = str(getenv('DB_ORG'))
+bucket = str(getenv('DB_BUCKET'))
 
 #Logger Config
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
