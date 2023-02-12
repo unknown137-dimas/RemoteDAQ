@@ -1,5 +1,3 @@
-from os import getenv
-from dotenv import load_dotenv
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 import uvicorn
@@ -8,9 +6,6 @@ from remoteDAQ_DB_Upload import main
 import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Thread
-
-# Load Variables
-load_dotenv()
 
 # DAQ Config
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
@@ -30,16 +25,7 @@ class response(BaseModel):
    success: bool
    data: list[response_data]
 
-class node_info_response(BaseModel):
-   hostname: str
-   zt_id: str
-
 app = FastAPI()
-
-@app.get('/node_info', response_model=node_info_response)
-async def node_info():
-    return node_info_response(hostname=str(getenv('HOSTNAME')),
-                              zt_id=str(getenv('ZT_ID')))
 
 @app.get('/analog/input', response_model=response)
 async def get_analog_input():
@@ -56,12 +42,12 @@ async def get_digital_output_input():
    result = await doi_daq(devDesc, portList)
    return result
 
-@app.put('/analog/output', response_model=response)
+@app.post('/analog/output', response_model=response)
 async def set_analog_output(data: request_data = Body(example={'value':[1.2, 3.4]})):
    result = await ao_daq(devDesc, data.value)
    return result
 
-@app.put('/digital/output', response_model=response)
+@app.post('/digital/output', response_model=response)
 async def set_digital_output(data: request_data = Body(example={'value':[0, 1, 0, 0, 0, 1, 0, 0]})):
    result = await do_daq(devDesc, data.value)
    return result
