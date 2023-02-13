@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#Create wpa_supplicant.conf File
+# Create wpa_supplicant.conf File
 sudo wpa_passphrase $2 $3  | sudo tee /etc/wpa_supplicant.conf
 
-#Create wpa_supplicant.service File
+# Create wpa_supplicant.service File
 cat <<EOF > wpa_supplicant.service
 [Unit]
 Description=WPA supplicant
@@ -23,7 +23,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 WantedBy=multi-user.target
 EOF
 
-#Create dhclient.service File
+# Create dhclient.service File
 cat <<EOF > dhclient.service
 [Unit]
 Description= DHCP Client
@@ -40,16 +40,19 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-#Copy wpa_supplicant.service & dhclient.service File
+# Copy wpa_supplicant.service & dhclient.service File
 sudo cp wpa_supplicant.service /etc/systemd/system/wpa_supplicant.service
 sudo cp dhclient.service /etc/systemd/system/dhclient.service
 
-#Reload Systemd
+# Reload Systemd
 sudo systemctl daemon-reload
 
-#Enable Service
+# Enable Service
 sudo systemctl enable wpa_supplicant.service
 sudo systemctl enable dhclient.service
 
-#Cleanup
-rm *.service
+# Cleanup
+sudo rm *.service
+
+# Restart
+sudo reboot
