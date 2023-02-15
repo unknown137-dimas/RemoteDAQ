@@ -26,8 +26,5 @@ chmod +x scripts/*
 # Run Helper Scripts
 ./scripts/wifi_setup.sh $wifi $ssid $pass
 
-# Creating .env File
-echo HOSTNAME=$HOTSNAME >> .env
-
 echo '== Init Process Completed =='
 echo '== Please Continue Setup Process from Server UI =='
