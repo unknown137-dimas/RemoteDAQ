@@ -1,5 +1,4 @@
 #!/bin/bash
-apt update
 install_packages make gcc bzip2 linux-headers-$(uname -r) kmod systemctl
 mkdir -p /lib/modules/$(uname -r)/kernel/drivers/daqnavi
 mkdir -p '/usr/local/lib/x86_64-linux-gnu'
