@@ -7,9 +7,9 @@ import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Thread
 
-# DAQ Config
+'''DAQ Config'''
 devDesc = 'USB-4704,BID#0' # CHANGE THIS
-portList = [_ for _ in range(0,8)]
+portList = [_ for _ in range(0,8)] # CHANGE THIS ACCORDINGLY
 
 '''API'''
 '''Request Model'''

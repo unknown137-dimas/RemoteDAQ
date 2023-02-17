@@ -6,7 +6,7 @@ from Automation.BDaq.InstantAiCtrl import InstantAiCtrl
 from Automation.BDaq.InstantAoCtrl import InstantAoCtrl
 import remoteDAQ_Logger
 
-#Logger Config
+'''Logger Config'''
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_USB')
 
 '''Function to Read Analog Input Signal'''

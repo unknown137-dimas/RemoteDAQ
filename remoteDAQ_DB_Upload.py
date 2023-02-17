@@ -8,19 +8,19 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 
-# Load Variables
+'''Load Variables'''
 load_dotenv()
 
-# InfluxDB Client Config
+'''InfluxDB Client Config'''
 url = str(getenv('DB_IP'))
 token = str(getenv('DB_TOKEN'))
 org = str(getenv('DB_ORG'))
 bucket = str(getenv('DB_BUCKET'))
 
-#Logger Config
+'''Logger Config'''
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 
-# Node Config
+'''Node Config'''
 hostname = str(getenv('HOSTNAME'))
 dev_id = str(uuid3(NAMESPACE_DNS, hostname))
       

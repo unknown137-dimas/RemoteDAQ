@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-# Log Config
+'''Log Config'''
 FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(message)s')
 LOG_FILE = 'logs/remoteDAQ.log'
 
