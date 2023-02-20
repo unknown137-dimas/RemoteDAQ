@@ -16,6 +16,10 @@ sudo apt install -y wpasupplicant > /dev/null 2>&1
 # Install Zerotier Client
 curl -s https://install.zerotier.com | sudo bash
 
+# Install Ansible
+echo 'Installing Ansible...'
+sudo apt install -y ansible > /dev/null 2>&1
+
 # Join Zerotier Network
 echo 'Connecting to ZeroTier Network...'
 sudo zerotier-cli join $zt_net_id

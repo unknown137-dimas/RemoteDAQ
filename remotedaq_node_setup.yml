@@ -1,0 +1,55 @@
+---
+  - name: Installing RemoteDAQ Node
+    hosts: localhost
+    connection: local
+    become: true
+    tasks:
+
+    # Install Docker
+    - name: Install Required System Packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-pip
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        filename: docker.list
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+
+    - name: Update apt and Install docker-ce
+      apt:
+        name:
+          - docker-ce
+          - docker-compose
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name:
+          - docker
+          - PyYAML
+
+    # Create .env File
+    - name: Generate .env File from Template
+      template:
+        src: .env.j2
+        dest: /home/{{ lookup('env', 'USER') }}/RemoteDAQ/.env
+
+    # Deploy RemoteDAQ Node
+    - name: Deploy Container
+      docker_compose:
+        project_src: /home/{{ lookup('env', 'USER') }}/RemoteDAQ
