@@ -47,7 +47,7 @@
     - name: Generate .env File from Template
       template:
         src: .env.j2
-        dest: /home/{{ lookup('env', 'USER') }}/RemoteDAQ/.env
+        dest: "{{ lookup('env', 'PWD') }}/.env"
 
     # Deploy RemoteDAQ Node
     - name: Deploy Container
