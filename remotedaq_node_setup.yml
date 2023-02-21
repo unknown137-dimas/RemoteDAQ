@@ -49,7 +49,14 @@
         src: .env.j2
         dest: "{{ lookup('env', 'PWD') }}/.env"
 
-    # Deploy RemoteDAQ Node
+    # Copy Project Files
+    - name: Copy Project Files to tmp Directory
+      copy:
+        src: .
+        dest: /tmp/RemoteDAQ
+
+    # Deploy RemoteDAQ Server
     - name: Deploy Container
       docker_compose:
-        project_src: /home/{{ lookup('env', 'USER') }}/RemoteDAQ
+        project_src: /tmp/RemoteDAQ
+        restarted: true
