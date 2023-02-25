@@ -43,11 +43,31 @@
           - docker
           - PyYAML
 
-    # Create .env File
-    - name: Generate .env File from Template
-      template:
-        src: .env.j2
-        dest: "{{ lookup('env', 'PWD') }}/.env"
+    # Rename .env File
+    - name: Rename .env-node File to .env File
+      copy:
+        src: .env-node
+        dest: .env
+    
+    # Get Hostname
+    - name: Get Hostname
+      shell: hostname
+      register: node_hostname
+
+    # Get ZeroTier ID
+    - name: Get ZeroTier ID
+      shell: zerotier-cli info | cut -d ' ' -f 3
+      register: zt_id
+
+    # Add Hostname
+    - name: Add Hostname Variable to .env File
+      lineinfile:
+        path: .env
+        insertafter: EOF
+        line: |
+          HOSTNAME={{ node_hostname.stdout }}
+          ZT_ID={{ zt_id.stdout }}
+        state: present
 
     # Copy Project Files
     - name: Copy Project Files to tmp Directory
