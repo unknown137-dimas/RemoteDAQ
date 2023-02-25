@@ -26,12 +26,12 @@ node_id = str(getenv('ZT_ID'))
       
 '''Create an InfluxDB Line Protocol Format'''
 def line_protocol(measurement_name, node_hostname, node_id, port, value):
-   return '{measurement_name},node={node_hostname},nodeID={node_id},port={port} value={value}'.format(
-         measurement_name,
-         node_hostname,
-         node_id,
-         port,
-         value
+   return '{measurement},node={node_name},nodeID={id},port={port} value={val}'.format(
+         measurement=measurement_name,
+         node_name=node_hostname,
+         id=node_id,
+         port=port,
+         val=value
       )
 
 '''InfluxDB Callback'''
