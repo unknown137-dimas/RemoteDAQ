@@ -21,17 +21,17 @@ bucket = str(getenv('DB_BUCKET'))
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 
 '''Node Config'''
-hostname = str(getenv('HOSTNAME'))
+node_hostname = str(getenv('NODE_HOSTNAME'))
 node_id = str(getenv('ZT_ID'))
       
 '''Create an InfluxDB Line Protocol Format'''
-def line_protocol(measurement_name, node, id, port, value):
-   return '{measurement},node={node},nodeID={id},port={port} value={val}'.format(
-         measurement=measurement_name,
-         node=node,
-         id=id,
-         port=port,
-         val=value
+def line_protocol(measurement_name, node_hostname, node_id, port, value):
+   return '{measurement_name},node={node_hostname},nodeID={node_id},port={port} value={value}'.format(
+         measurement_name,
+         node_hostname,
+         node_id,
+         port,
+         value
       )
 
 '''InfluxDB Callback'''
@@ -76,9 +76,9 @@ async def main(devDesc, portList):
          for i in portList:
             result = daq_results[r]['data'][i]
             tmp_upload = line_protocol(
-               measurement_name = measurement_name[r],
-               node=hostname,
-               id=node_id,
+               measurement_name=measurement_name[r],
+               node_hostname=node_hostname,
+               node_id=node_id,
                port=result['port'],
                value=result['value']
             )

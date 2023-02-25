@@ -65,7 +65,7 @@
         path: .env
         insertafter: EOF
         line: |
-          HOSTNAME={{ node_hostname.stdout }}
+          NODE_HOSTNAME={{ node_hostname.stdout }}
           ZT_ID={{ zt_id.stdout }}
         state: present
 
