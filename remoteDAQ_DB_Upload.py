@@ -22,7 +22,7 @@ my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_DB_Upload')
 
 '''Node Config'''
 hostname = str(getenv('HOSTNAME'))
-dev_id = str(uuid3(NAMESPACE_DNS, hostname))
+node_id = str(getenv('ZT_ID'))
       
 '''Create an InfluxDB Line Protocol Format'''
 def line_protocol(measurement_name, node, id, port, value):
@@ -78,7 +78,7 @@ async def main(devDesc, portList):
             tmp_upload = line_protocol(
                measurement_name = measurement_name[r],
                node=hostname,
-               id=dev_id,
+               id=node_id,
                port=result['port'],
                value=result['value']
             )
