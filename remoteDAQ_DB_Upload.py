@@ -1,10 +1,8 @@
 
 from os import getenv
 from dotenv import load_dotenv
-from uuid import uuid3, NAMESPACE_DNS
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.exceptions import InfluxDBError
-from influxdb_client.client.write_api import SYNCHRONOUS
 import remoteDAQ_Logger
 from remoteDAQ_USB import ai_daq, di_daq, doi_daq
 
@@ -26,12 +24,12 @@ node_id = str(getenv('ZT_ID'))
       
 '''Create an InfluxDB Line Protocol Format'''
 def line_protocol(measurement_name, node_hostname, node_id, port, value):
-   return '{measurement},node={node_name},nodeID={id},port={port} value={val}'.format(
+   return '{measurement},node={hostname},nodeID={id},port={port} value={value}'.format(
          measurement=measurement_name,
-         node_name=node_hostname,
+         hostname=node_hostname,
          id=node_id,
          port=port,
-         val=value
+         value=value
       )
 
 '''InfluxDB Callback'''
