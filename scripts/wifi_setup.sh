@@ -17,6 +17,8 @@ Type=dbus
 BusName=fi.w1.wpa_supplicant1
 ExecStart=/sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i $1
 Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
