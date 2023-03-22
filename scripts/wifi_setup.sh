@@ -51,12 +51,13 @@ sudo cp dhclient.service /etc/systemd/system/dhclient.service
 # Reload Systemd
 sudo systemctl daemon-reload
 
-# Enable Service
+# Enable Services
 sudo systemctl enable wpa_supplicant.service
 sudo systemctl enable dhclient.service
 
+# Start Services
+sudo systemctl start wpa_supplicant.service
+sudo systemctl start dhclient.service
+
 # Cleanup
 sudo rm *.service
-
-# Restart
-sudo reboot
