@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Intro
 echo '== Node Init Process Begin =='
 
 # User Input
@@ -24,6 +25,9 @@ sudo apt install -y ansible > /dev/null 2>&1
 echo 'Connecting to ZeroTier Network...'
 sudo zerotier-cli join $zt_net_id
 
+# Get Zerotier Node ID
+NODE_ID=$(sudo zerotier-cli info | cut -d ' ' -f 3)
+
 # Update Helper Scripts Permission
 echo 'Configuring Wi-Fi...'
 chmod +x scripts/*
@@ -35,5 +39,8 @@ chmod +x scripts/*
 echo 'Configuring Sudoers...'
 sudo echo $USER 'ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-echo '== Init Process Completed =='
-echo '== Please Continue Setup Process from Server UI =='
+# Outro
+echo -e '== Init Process Completed ==\n'
+echo -e 'Your Node ID : '$NODE_ID'\n'
+echo -e 'Use the ID to continue setup process\n'
+echo -e '== Please Continue Setup Process from Server UI =='
