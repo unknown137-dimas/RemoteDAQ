@@ -14,20 +14,6 @@ echo 'Installing Wi-Fi Packages...'
 sudo apt update > /dev/null 2>&1
 sudo apt install -y wpasupplicant > /dev/null 2>&1
 
-# Install Zerotier Client
-curl -s https://install.zerotier.com | sudo bash
-
-# Install Ansible
-echo 'Installing Ansible...'
-sudo apt install -y ansible > /dev/null 2>&1
-
-# Join Zerotier Network
-echo 'Connecting to ZeroTier Network...'
-sudo zerotier-cli join $zt_net_id
-
-# Get Zerotier Node ID
-NODE_ID=$(sudo zerotier-cli info | cut -d ' ' -f 3)
-
 # Update Helper Scripts Permission
 echo 'Configuring Wi-Fi...'
 chmod +x scripts/*
@@ -38,6 +24,20 @@ chmod +x scripts/*
 # Set Sudoer
 echo 'Configuring Sudoers...'
 sudo echo $USER 'ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Install Zerotier Client
+curl -s https://install.zerotier.com | sudo bash
+
+# Join Zerotier Network
+echo 'Connecting to ZeroTier Network...'
+sudo zerotier-cli join $zt_net_id
+
+# Get Zerotier Node ID
+NODE_ID=$(sudo zerotier-cli info | cut -d ' ' -f 3)
+
+# Install Ansible
+echo 'Installing Ansible...'
+sudo apt install -y ansible > /dev/null 2>&1
 
 # Outro
 echo -e '== Init Process Completed ==\n'
