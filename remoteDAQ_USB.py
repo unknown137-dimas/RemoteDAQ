@@ -10,7 +10,7 @@ import remoteDAQ_Logger
 my_logger = remoteDAQ_Logger.get_logger('RemoteDAQ_USB')
 
 '''Function to Read Analog Input Signal'''
-async def ai_daq(devDesc, portList, decimalPrecision=2, logger=my_logger):
+async def ai_daq(devDesc, portList, decimalPrecision=3, logger=my_logger):
    logger.info('### Starting reading analog input data ###')
    result = {}
    try:
