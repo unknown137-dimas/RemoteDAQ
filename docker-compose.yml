@@ -9,6 +9,9 @@ services:
       - 8000:8000
     volumes:
       - ./remoteDAQ.py:/rdaq-node/remoteDAQ.py:ro
+      - ./remoteDAQ_DB_Upload.py:/rdaq-node/remoteDAQ_DB_Upload.py:ro
+      - ./remoteDAQ_Logger.py:/rdaq-node/remoteDAQ_Logger.py:ro
+      - ./remoteDAQ_USB.py:/rdaq-node/remoteDAQ_USB.py:ro
       - ./.env:/rdaq-node/.env:ro
       - ./logs:/rdaq-node/logs
     privileged: true
