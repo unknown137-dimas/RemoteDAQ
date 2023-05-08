@@ -22,8 +22,11 @@ sudo apt install -y ansible > /dev/null 2>&1
 echo 'Configuring Wi-Fi...'
 chmod +x scripts/*
 
-# Run Helper Scripts
-./scripts/wifi_setup.sh $wifi $ssid $pass
+# Setup Wi-Fi Network
+sudo ./scripts/wifi_setup.sh $wifi $ssid $pass
+
+# Install DAQ Driver
+sudo ./scripts/driver_install.sh
 
 # Install Zerotier Client
 curl -s https://install.zerotier.com | sudo bash
