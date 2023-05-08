@@ -39,7 +39,8 @@ sudo zerotier-cli join $zt_net_id
 NODE_ID=$(sudo zerotier-cli info | cut -d ' ' -f 3)
 
 # Outro
-echo -e '== Init Process Completed ==\n' >> setup.log
-echo -e 'Your Node ID : '$NODE_ID'\n' >> setup.log
-echo -e 'Use the ID to continue setup process\n' >> setup.log
-echo -e '== Please Continue Setup Process from Server UI ==' >> setup.log
+echo -e '== Init Process Completed ==\n'
+echo -e 'Your Node ID : '$NODE_ID'\n'
+echo -e 'Your Node ID : '$NODE_ID'\n' >> node_id.txt
+echo -e 'Use the ID to continue setup process\n'
+echo -e '== Please Continue Setup Process from Server UI =='
