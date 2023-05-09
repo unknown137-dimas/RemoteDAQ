@@ -6,7 +6,7 @@ FORMATTER = logging.Formatter('%(asctime)s — %(name)s — %(levelname)s — %(
 
 '''Log File Handler'''
 def get_file_handler(logger_name):
-   file_handler = TimedRotatingFileHandler('logs/{}.log'.format(logger_name), when='midnight')
+   file_handler = TimedRotatingFileHandler('logs/{}.log'.format(logger_name), when='midnight', backupCount=7)
    file_handler.setFormatter(FORMATTER)
    return file_handler
 
