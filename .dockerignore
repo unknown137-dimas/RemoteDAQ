@@ -1,0 +1,6 @@
+logs/*
+scripts/wifi_setup.sh
+docker-compose.yml
+*Dockerfile*
+remotedaq_node_setup.yml
+setup.sh
