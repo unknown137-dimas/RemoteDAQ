@@ -40,7 +40,8 @@ if $wireless; then
 fi
 
 # Install Zerotier Client
-curl -s https://install.zerotier.com | sudo bash
+echo 'Installing ZeroTier Client...'
+curl -s https://install.zerotier.com | sudo bash > /dev/null 2>&1
 
 # Join Zerotier Network
 echo 'Connecting to ZeroTier Network...'
