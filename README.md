@@ -2,15 +2,17 @@
 RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) device.
 
 # How to Install
-1. Add user to `/etc/sudoers` (replace USER with actual username) using root account.
+1. Permit SSH login using root account using command below and configure new password for root.
     ```
-    USER ALL=(ALL) NOPASSWD:ALL
+    sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sudo systemctl restart ssh
+    sudo passwd
     ```
 2. [OPTIONAL] Check wireless interface name for setup process with command below, It should start with `wlp` or anything similar, please check your OS documentation.
     ```
     ip link show
     ```
-3. Clone this repository.
+3. Go to your user's home directory and clone this repository.
     ```
     git clone https://github.com/unknown137-dimas/RemoteDAQ.git
     ```
