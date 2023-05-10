@@ -2,7 +2,7 @@
 RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) device.
 
 # How to Install
-1. Add user to `/etc/sudoers` (replace USER with actual username)
+1. Add user to `/etc/sudoers` (replace USER with actual username) using root account.
     ```
     USER ALL=(ALL) NOPASSWD:ALL
     ```
@@ -10,11 +10,16 @@ RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) 
     ```
     ip link show
     ```
-3. Change `setup.sh` script permission:
+3. Clone this repository.
+    ```
+    git clone https://github.com/unknown137-dimas/RemoteDAQ.git
+    ```
+4. `cd` to inside the repository.
+5. Change `setup.sh` script permission:
     ```
     chmod +x setup.sh
     ```
-4. Run `setup.sh` command:
+6. Run `setup.sh` command:
     ```
     sudo ./setup.sh
     ```
@@ -22,5 +27,6 @@ RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) 
     ```
     sudo ./setup.sh -w
     ```
-5. Fill the prompt accordingly.
-6. Wait until finished.
+7. Fill the prompt accordingly.
+8. Wait until finished.
+9. Continue the installation from the dashboard by installing the server-side system [here](https://github.com/unknown137-dimas/RemoteDAQ-Server).
