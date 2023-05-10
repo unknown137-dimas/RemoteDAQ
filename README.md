@@ -14,7 +14,7 @@ RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) 
     ```
 3. Go to your user's home directory and clone this repository.
     ```
-    git clone https://github.com/unknown137-dimas/RemoteDAQ.git
+    git clone https://github.com/unknown137-dimas/RemoteDAQ
     ```
 4. `cd` to inside the repository.
 5. Change `setup.sh` script permission:
