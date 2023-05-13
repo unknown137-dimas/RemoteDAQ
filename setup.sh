@@ -19,6 +19,7 @@ if $wireless; then
     read -p 'Input Wi-Fi network name: ' ssid
     read -sp 'Input Wi-Fi password: ' pass
 fi
+echo -e ''
 read -p 'Input ZeroTier network ID: ' zt_net_id
 
 # Install Ansible
