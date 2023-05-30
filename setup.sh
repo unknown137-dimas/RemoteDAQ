@@ -22,8 +22,13 @@ fi
 echo -e ''
 read -p 'Input ZeroTier network ID: ' zt_net_id
 
+# Update All Packages
+sudo apt update > /dev/null 2>&1
+sudo apt upgrade -y > /dev/null 2>&1
+
 # Install Ansible
 echo 'Installing Ansible...'
+sudo apt update > /dev/null 2>&1
 sudo apt install -y ansible > /dev/null 2>&1
 
 if $wireless; then
