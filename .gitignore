@@ -1,9 +1,6 @@
-.*-venv/*
-*.code-workspace
-Automation/BDaq/__pycache__/*
-__pycache__/*
-Automation/__pycache__/*
-examples/*
-logs/*
+__pycache__
+examples
+logs
+.venv
 .env
-
+*.code-workspace
