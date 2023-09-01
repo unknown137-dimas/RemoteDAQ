@@ -1,5 +1,5 @@
 # RemoteDAQ
-RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) device.
+RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) device. It can be controlled via REST API.
 
 # Supported DAQ Devices
 1. Advantech USB 4702/4704
