@@ -1,6 +1,9 @@
 # RemoteDAQ
 RemoteDAQ is a device configured to manage and control a Data Acquisition (DAQ) device.
 
+# Supported DAQ Devices
+1. Advantech USB 4702/4704
+
 # How to Install
 1. Permit SSH login using root account using command below and configure new password for root.
     ```
